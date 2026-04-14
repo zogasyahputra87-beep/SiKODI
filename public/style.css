@@ -1,33 +1,22 @@
-/* Custom Scrollbar untuk Sidebar */
-aside::-webkit-scrollbar {
-    width: 4px;
-}
-aside::-webkit-scrollbar-thumb {
-    background: #4b5563;
-    border-radius: 10px;
-}
+/* Custom Scrollbar */
+aside::-webkit-scrollbar { width: 4px; }
+aside::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
 
-/* Nav Item Active Style */
+/* Nav Item Style */
+.nav-item { color: #9ca3af; text-align: left; }
+.nav-item:hover { background-color: #374151; color: white; }
+
+/* Active Menu */
 .nav-item.active {
-    background-color: #374151; /* gray-700 */
+    background-color: #374151;
     color: white;
     font-weight: 700;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-right: 4px solid #9ca3af;
 }
 
-/* Animasi Fade In untuk Konten */
-#content-area {
-    animation: fadeIn 0.5s ease-in-out;
-}
-
+/* Page Transition */
+#content-area { animation: fadeIn 0.4s ease-out; }
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-/* Responsivitas Form di HP */
-@media (max-width: 640px) {
-    .p-8 {
-        padding: 1.5rem;
-    }
 }
