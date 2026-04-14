@@ -156,7 +156,7 @@
     localStorage.setItem('consultations', JSON.stringify(localData));
 
     // 2. Kirim ke Spreadsheet (Otomatis)
-    fetch('https://script.google.com/macros/s/AKfycbxS-AnBNpQuxAW0tda4hRZ7lcR42PVPT6ek5udTy-plpQu1xk7ArSJFYpdDV44W3DaH/exec', {
+    fetch('https://script.google.com/macros/s/AKfycbwO0TSQKAyurBIc5upFRUren16IOZBBMyLJk6iTvgi0wS_16K-d3ZgtFPLon207F_Yx/exec', {
         method: 'POST',
         body: JSON.stringify(formData)
     })
