@@ -1,0 +1,33 @@
+/* Custom Scrollbar untuk Sidebar */
+aside::-webkit-scrollbar {
+    width: 4px;
+}
+aside::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 10px;
+}
+
+/* Nav Item Active Style */
+.nav-item.active {
+    background-color: #374151; /* gray-700 */
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Animasi Fade In untuk Konten */
+#content-area {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsivitas Form di HP */
+@media (max-width: 640px) {
+    .p-8 {
+        padding: 1.5rem;
+    }
+}
