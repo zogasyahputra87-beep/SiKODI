@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | E-Consulting Inspektorat</title>
+    <title>Buat Konsultasi | E-Consulting</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
@@ -20,13 +20,13 @@
             
             <nav class="flex-1 mt-6 px-4 space-y-1">
                 <a href="index.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">
-                    <span class="mr-3"></span> Dashboard
+                    <span class="mr-3">📊</span> Dashboard
                 </a>
                 <a href="buat-konsultasi.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-gray-400">
-                    <span class="mr-3"></span> Buat Konsultasi
+                    <span class="mr-3">➕</span> Buat Konsultasi
                 </a>
                 <a href="riwayat.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">
-                    <span class="mr-3"></span> Riwayat Konsultasi
+                    <span class="mr-3">📂</span> Riwayat Konsultasi
                 </a>
             </nav>
 
@@ -50,41 +50,56 @@
                 </div>
             </header>
 
-   <main class="flex-1 flex flex-col overflow-y-auto">
             <div class="p-8 max-w-3xl mx-auto w-full">
                 <div class="bg-white p-10 rounded-2xl shadow-sm border border-gray-200">
                     <form id="consultForm" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Instansi / OPD</label>
-                                <input type="text" id="subject" class="w-full p-3 bg-gray-50 border  bg-white shadow-inner" placeholder="Instansi/OPD" required>
+                                <input type="text" id="opdName" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-gray-400" placeholder="Contoh: Dinas Kesehatan" required>
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Jenis Konsultasi</label>
-                                <select id="consultType" onchange="toggleOtherInput()" class="w-full p-3 bg-gray-50 border rounded-xl outline-none" required>
+                                <select id="consultType" onchange="toggleOtherInput()" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-gray-400" required>
                                     <option value="">-- Pilih Kategori --</option>
-                                    <option>Pengelolaan Keuangan</option>
-                                    <option>Administrasi Pemerintahan</option>
-                                    <option>Pengadaan Barang/Jasa</option>
-                                    <option>Pelaksanaan Progra/Kegiatan</option>
-                                    <option>Lainnya</option>
-                                    <option><input type="text" id="otherConsultType" class="w-full p-3 border rounded-xl bg-white shadow-inner" placeholder="Lainnya..."></option>
+                                    <option value="Pengelolaan Keuangan">Pengelolaan Keuangan</option>
+                                    <option value="Administrasi Pemerintahan">Administrasi Pemerintahan</option>
+                                    <option value="Pengadaan Barang/Jasa">Pengadaan Barang/Jasa</option>
+                                    <option value="Pelaksanaan Program/Kegiatan">Pelaksanaan Program/Kegiatan</option>
+                                    <option value="Lainnya">Lainnya</option>
                                 </select>
                             </div>
                         </div>
-                        
-                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Judul Permasalahan</label>
-                            <input type="text" id="subject" class="w-full p-3 bg-gray-50 border rounded-xl outline-none" required>
+
+                        <div id="otherTypeContainer" class="hidden">
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2 italic">Sebutkan Jenis Konsultasi</label>
+                            <input type="text" id="otherConsultType" class="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-gray-400 shadow-inner" placeholder="Ketik jenis konsultasi lainnya...">
                         </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Judul Permasalahan</label>
+                            <input type="text" id="subject" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-gray-400" placeholder="Contoh: Kendala Input SIPD" required>
+                        </div>
+
                         <div>
                             <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Rincian Masalah</label>
-                            <textarea id="issue" class="w-full p-3 bg-gray-50 border rounded-xl outline-none" rows="4" required></textarea>
+                            <textarea id="issue" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-gray-400" rows="4" placeholder="Jelaskan detail permasalahan..." required></textarea>
                         </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <input type="tel" id="whatsapp" placeholder="No. WhatsApp" class="w-full p-3 border rounded-xl" required>
-                            <input type="email" id="email" placeholder="Email" class="w-full p-3 border rounded-xl" required>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">WhatsApp</label>
+                                <input type="tel" id="whatsapp" placeholder="08123xxx" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400" required>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Email</label>
+                                <input type="email" id="email" placeholder="instansi@malangkab.go.id" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400" required>
+                            </div>
                         </div>
-                        <button type="submit" class="w-full bg-gray-800 text-white font-bold py-4 rounded-xl shadow-lg">Kirim Pengajuan</button>
+
+                        <button type="submit" class="w-full bg-gray-800 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-gray-900 transition-all active:scale-95">
+                            Kirim Pengajuan
+                        </button>
                     </form>
                 </div>
             </div>
@@ -93,17 +108,30 @@
 
     <script>
         function toggleOtherInput() {
-            const val = document.getElementById('consultType').value;
-            const container = document.getElementById('otherTypeContainer');
-            val === 'Lainnya' ? container.classList.remove('hidden') : container.classList.add('hidden');
+            const selectVal = document.getElementById('consultType').value;
+            const otherContainer = document.getElementById('otherTypeContainer');
+            const otherInput = document.getElementById('otherConsultType');
+
+            if (selectVal === 'Lainnya') {
+                otherContainer.classList.remove('hidden');
+                otherInput.setAttribute('required', 'required');
+            } else {
+                otherContainer.classList.add('hidden');
+                otherInput.removeAttribute('required');
+            }
         }
 
         document.getElementById('consultForm').addEventListener('submit', (e) => {
             e.preventDefault();
+            
+            // Ambil data lama dari LocalStorage
             const data = JSON.parse(localStorage.getItem('consultations')) || [];
+            
+            // Proses Jenis Konsultasi
             const selectedType = document.getElementById('consultType').value;
             const finalType = (selectedType === 'Lainnya') ? document.getElementById('otherConsultType').value : selectedType;
 
+            // Masukkan data baru
             data.push({
                 opd: document.getElementById('opdName').value,
                 type: finalType,
@@ -114,9 +142,12 @@
                 status: 'Menunggu',
                 date: new Date().toLocaleDateString('id-ID')
             });
+
+            // Simpan kembali
             localStorage.setItem('consultations', JSON.stringify(data));
-            alert('Berhasil!');
-            window.location.href = "riwayat.html"; // LONCAT KE RIWAYAT
+            
+            alert('Konsultasi Berhasil Terkirim!');
+            window.location.href = "riwayat.html"; 
         });
     </script>
 </body>
