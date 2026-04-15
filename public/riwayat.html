@@ -79,7 +79,52 @@
                     loading.innerText = "Belum ada riwayat konsultasi.";
                     return;
                 }
+function doGet() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getActiveSheet();
+    const rows = sheet.getDataRange().getValues();
+    const result = [];
+    
+    // Looping dimulai dari baris ke-2 (index 1) untuk melewati header
+    for (var i = 1; i < rows.length; i++) {
+      
+      // Validasi: Lewati baris jika kolom OPD (index 1) kosong
+      if (!rows[i][1] || rows[i][1].toString().trim() === "") continue;
 
+      // Format tanggal agar seragam dd/MM/yyyy
+      let formatWaktu = "";
+      try {
+        if (rows[i][0] instanceof Date) {
+          formatWaktu = Utilities.formatDate(rows[i][0], "GMT+7", "dd/MM/yyyy");
+        } else {
+          formatWaktu = rows[i][0].toString();
+        }
+      } catch (e) {
+        formatWaktu = "-";
+      }
+
+      result.push({
+        id: i, // Penting untuk identifikasi baris saat update status oleh admin
+        waktu: formatWaktu,
+        opd: rows[i][1].toString().trim(),
+        kategori: rows[i][2] ? rows[i][2].toString().trim() : "-",
+        judul: rows[i][3] ? rows[i][3].toString().trim() : "-",
+        // Ambil status dari kolom G (index 6), jika kosong default ke "Menunggu"
+        status: (rows[i][6] && rows[i][6].toString().trim() !== "") ? rows[i][6].toString().trim() : "Menunggu"
+      });
+    }
+    
+    // Mengembalikan output dalam format JSON
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    // Jika ada error di server, kirim pesan error dalam format JSON
+    return ContentService.createTextOutput(JSON.stringify({ error: error.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
                 loading.classList.add('hidden');
                 
                 // Render tabel hanya dengan 4 kolom sesuai permintaan
