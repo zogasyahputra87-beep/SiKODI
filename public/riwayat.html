@@ -30,24 +30,16 @@
                 </a>
             </nav>
 
-            <div class="p-6 border-t border-gray-700">
-                <div class="bg-gray-800 p-4 rounded-lg text-center">
-                    <p class="text-[10px] text-gray-500 uppercase mb-1">Pengembang</p>
-                    <p class="text-xs font-bold text-gray-300 uppercase tracking-tighter">Ananda Zoga Syahputra</p>
-                </div>
+            <div class="p-6 border-t border-gray-700 text-center">
+                <p class="text-[9px] text-gray-500 uppercase mb-1">Pengembang</p>
+                <p class="text-xs font-bold text-gray-300 uppercase tracking-tighter">Ananda Zoga Syahputra</p>
             </div>
         </aside>
 
         <main class="flex-1 flex flex-col overflow-y-auto">
             <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-8 h-20 flex-shrink-0 shadow-sm">
                 <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">Daftar Riwayat Konsultasi</h2>
-                <div class="flex items-center space-x-4">
-                    <div class="text-right">
-                        <p class="text-xs font-bold text-gray-700">Administrator</p>
-                        <p class="text-[10px] text-gray-400">Aktualisasi Latsar 2026</p>
-                    </div>
-                    <div class="w-10 h-10 bg-gray-100 rounded-full border border-gray-200 flex items-center justify-center text-xl shadow-inner">👤</div>
-                </div>
+                <div class="w-10 h-10 bg-gray-100 rounded-full border flex items-center justify-center text-xl shadow-inner">👤</div>
             </header>
 
             <div class="p-8">
@@ -55,17 +47,17 @@
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-gray-50 border-b border-gray-100">
                             <tr class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">
+                                <th class="p-5">Waktu / Tanggal</th>
                                 <th class="p-5">Instansi</th>
                                 <th class="p-5">Judul & Jenis</th>
                                 <th class="p-5 text-center">Status</th>
-                                <th class="p-5 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="consultList" class="divide-y divide-gray-50">
                             </tbody>
                     </table>
-                    <div id="empty-state" class="hidden p-10 text-center text-gray-400 italic text-sm">
-                        Belum ada riwayat konsultasi.
+                    <div id="loading-state" class="p-10 text-center text-gray-400 italic text-sm">
+                        Memuat data riwayat...
                     </div>
                 </div>
             </div>
@@ -73,56 +65,52 @@
     </div>
 
     <script>
-        function loadData() {
-            const data = JSON.parse(localStorage.getItem('consultations')) || [];
+        const API_URL = "URL_WEB_APP_APPS_SCRIPT_ANDA"; // Ganti dengan URL Deployment Apps Script Anda
+
+        async function loadRiwayat() {
             const listTable = document.getElementById('consultList');
-            const emptyState = document.getElementById('empty-state');
+            const loading = document.getElementById('loading-state');
 
-            if (data.length === 0) {
-                emptyState.classList.remove('hidden');
-                listTable.innerHTML = '';
-                return;
-            }
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
 
-            emptyState.classList.add('hidden');
-            listTable.innerHTML = data.map((item, index) => `
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="p-5 font-bold text-sm text-gray-700 align-middle">${item.opd || item.opdName}</td>
-                    <td class="p-5 align-middle">
-                        <div class="text-sm font-bold text-gray-800">${item.subject}</div>
-                        <div class="text-[10px] text-gray-400 uppercase font-semibold">${item.type || 'Umum'}</div>
-                    </td>
-                    <td class="p-5 text-center align-middle">
-                        <div class="flex justify-center">
-                            <span class="inline-block w-24 py-1.5 ${item.status === 'Selesai' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'} text-[10px] font-bold rounded-full uppercase tracking-tighter border text-center">
-                                ${item.status || 'Menunggu'}
-                            </span>
-                        </div>
-                    </td>
-                    <td class="p-5 text-center align-middle">
-                        <button onclick="deleteData(${index})" class="text-red-400 hover:text-red-600 transition p-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </td>
-                </tr>
-            `).reverse().join(''); // Reverse agar data terbaru di atas
-        }
+                if (data.length === 0) {
+                    loading.innerText = "Belum ada riwayat konsultasi.";
+                    return;
+                }
 
-        function deleteData(index) {
-            if(confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                let data = JSON.parse(localStorage.getItem('consultations')) || [];
-                // Karena kita me-reverse data saat tampil, kita perlu menyesuaikan index asli
-                const actualIndex = data.length - 1 - index;
-                data.splice(actualIndex, 1);
-                localStorage.setItem('consultations', JSON.stringify(data));
-                loadData();
+                loading.classList.add('hidden');
+                
+                // Render tabel hanya dengan 4 kolom sesuai permintaan
+                listTable.innerHTML = data.reverse().map((item) => `
+                    <tr class="hover:bg-gray-50 transition border-b border-gray-50">
+                        <td class="p-5 text-xs text-gray-400 align-middle">
+                            ${item.waktu}
+                        </td>
+                        <td class="p-5 font-bold text-sm text-gray-700 align-middle">
+                            ${item.opd}
+                        </td>
+                        <td class="p-5 align-middle">
+                            <div class="text-sm font-bold text-gray-800">${item.judul}</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-semibold italic">${item.kategori}</div>
+                        </td>
+                        <td class="p-5 text-center align-middle">
+                            <div class="flex justify-center">
+                                <span class="inline-block w-24 py-1.5 ${item.status === 'Selesai' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'} text-[10px] font-bold rounded-full uppercase tracking-tighter border text-center">
+                                    ${item.status}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                loading.innerText = "Gagal memuat data dari server.";
+                console.error(error);
             }
         }
 
-        // Inisialisasi data saat halaman dibuka
-        window.onload = loadData;
+        window.onload = loadRiwayat;
     </script>
 </body>
 </html>
