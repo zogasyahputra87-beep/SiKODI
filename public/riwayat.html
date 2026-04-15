@@ -7,156 +7,75 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
-
     <div class="flex h-screen overflow-hidden">
         <aside class="w-72 bg-[#1F2937] text-gray-300 flex-shrink-0 hidden md:flex flex-col">
             <div class="p-8 border-b border-gray-700">
-                <div class="flex items-center space-x-3 mb-2">
-                    <div class="w-8 h-8 bg-gray-600 rounded flex items-center justify-center font-bold text-white">E</div>
-                    <h1 class="text-xl font-bold tracking-tight text-white">E-CONSULTING</h1>
-                </div>
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight">Inspektorat Daerah<br>Kabupaten Malang</p>
+                <h1 class="text-xl font-bold text-white">E-CONSULTING</h1>
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest">Inspektorat Kab. Malang</p>
             </div>
-            
             <nav class="flex-1 mt-6 px-4 space-y-1">
-                <a href="index.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">
-                    <span class="mr-3">📊</span> Dashboard
-                </a>
-                <a href="buat-konsultasi.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">
-                    <span class="mr-3">➕</span> Buat Konsultasi
-                </a>
-                <a href="riwayat.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-gray-400">
-                    <span class="mr-3">📂</span> Riwayat Konsultasi
-                </a>
+                <a href="index.html" class="flex p-3 rounded-lg hover:bg-gray-800 text-sm">Dashboard</a>
+                <a href="buat-konsultasi.html" class="flex p-3 rounded-lg hover:bg-gray-800 text-sm">Buat Konsultasi</a>
+                <a href="riwayat.html" class="bg-gray-700 text-white flex p-3 rounded-lg text-sm font-bold border-r-4 border-blue-500">Riwayat Konsultasi</a>
             </nav>
-
-            <div class="p-6 border-t border-gray-700 text-center">
-                <p class="text-[9px] text-gray-500 uppercase mb-1">Pengembang</p>
-                <p class="text-xs font-bold text-gray-300 uppercase tracking-tighter">Ananda Zoga Syahputra</p>
-            </div>
         </aside>
 
         <main class="flex-1 flex flex-col overflow-y-auto">
-            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-8 h-20 flex-shrink-0 shadow-sm">
-                <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">Daftar Riwayat Konsultasi</h2>
-                <div class="w-10 h-10 bg-gray-100 rounded-full border flex items-center justify-center text-xl shadow-inner">👤</div>
+            <header class="bg-white border-b p-4 px-8 h-20 flex justify-between items-center shadow-sm">
+                <h2 class="font-bold text-gray-800 uppercase">Riwayat Konsultasi</h2>
+                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-xl shadow-inner">👤</div>
             </header>
 
             <div class="p-8">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-gray-50 border-b border-gray-100">
-                            <tr class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">
+                <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b">
+                            <tr class="text-[10px] text-gray-400 uppercase font-bold">
                                 <th class="p-5">Waktu</th>
-                                <th class="p-5">Opd</th>
-                                <th class="p-5">Kategori</th>
-                                <th class="p-5">Judul</th>
+                                <th class="p-5">Instansi</th>
+                                <th class="p-5">Judul & Jenis</th>
                                 <th class="p-5 text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="consultList" class="divide-y divide-gray-50">
-                            </tbody>
+                        <tbody id="listTable" class="divide-y divide-gray-50"></tbody>
                     </table>
-                    <div id="loading-state" class="p-10 text-center text-gray-400 italic text-sm">
-                        Memuat data riwayat...
-                    </div>
+                    <div id="loader" class="p-10 text-center text-gray-400 italic">Memuat data riwayat...</div>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbz17jvNvPAL0B-whm_tyt5DiGvsiPA6akHDIyGWj8akjzHmEVeV6Fq9QdQxp5BKD55V/exec"; // Ganti dengan URL Deployment Apps Script Anda
+        const API_URL = "https://script.google.com/macros/s/AKfycbz61JFHQZumYdYQJUS09wY6NqTXfWMaegnb3QW5AfLS8Ppr7NPLQpK-fqEoP_JOXrKt/exec";
 
-        async function loadRiwayat() {
-            const listTable = document.getElementById('consultList');
-            const loading = document.getElementById('loading-state');
-
+        async function loadData() {
             try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-
-                if (data.length === 0) {
-                    loading.innerText = "Belum ada riwayat konsultasi.";
-                    return;
-                }
-function doGet() {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getActiveSheet();
-    const rows = sheet.getDataRange().getValues();
-    const result = [];
-    
-    // Looping dimulai dari baris ke-2 (index 1) untuk melewati header
-    for (var i = 1; i < rows.length; i++) {
-      
-      // Validasi: Lewati baris jika kolom OPD (index 1) kosong
-      if (!rows[i][1] || rows[i][1].toString().trim() === "") continue;
-
-      // Format tanggal agar seragam dd/MM/yyyy
-      let formatWaktu = "";
-      try {
-        if (rows[i][0] instanceof Date) {
-          formatWaktu = Utilities.formatDate(rows[i][0], "GMT+7", "dd/MM/yyyy");
-        } else {
-          formatWaktu = rows[i][0].toString();
-        }
-      } catch (e) {
-        formatWaktu = "-";
-      }
-
-      result.push({
-        id: i, // Penting untuk identifikasi baris saat update status oleh admin
-        waktu: formatWaktu,
-        opd: rows[i][1].toString().trim(),
-        kategori: rows[i][2] ? rows[i][2].toString().trim() : "-",
-        judul: rows[i][3] ? rows[i][3].toString().trim() : "-",
-        // Ambil status dari kolom G (index 6), jika kosong default ke "Menunggu"
-        status: (rows[i][6] && rows[i][6].toString().trim() !== "") ? rows[i][6].toString().trim() : "Menunggu"
-      });
-    }
-    
-    // Mengembalikan output dalam format JSON
-    return ContentService.createTextOutput(JSON.stringify(result))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  } catch (error) {
-    // Jika ada error di server, kirim pesan error dalam format JSON
-    return ContentService.createTextOutput(JSON.stringify({ error: error.message }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-                loading.classList.add('hidden');
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                document.getElementById('loader').classList.add('hidden');
                 
-                // Render tabel hanya dengan 4 kolom sesuai permintaan
-                listTable.innerHTML = data.reverse().map((item) => `
-                    <tr class="hover:bg-gray-50 transition border-b border-gray-50">
-                        <td class="p-5 text-xs text-gray-400 align-middle">
-                            ${item.waktu}
-                        </td>
-                        <td class="p-5 font-bold text-sm text-gray-700 align-middle">
-                            ${item.opd}
-                        </td>
+                document.getElementById('listTable').innerHTML = data.reverse().map(item => `
+                    <tr>
+                        <td class="p-5 text-xs text-gray-400 align-middle">${item.waktu}</td>
+                        <td class="p-5 font-bold text-sm align-middle">${item.opd}</td>
                         <td class="p-5 align-middle">
                             <div class="text-sm font-bold text-gray-800">${item.judul}</div>
                             <div class="text-[10px] text-gray-400 uppercase font-semibold italic">${item.kategori}</div>
                         </td>
                         <td class="p-5 text-center align-middle">
                             <div class="flex justify-center">
-                                <span class="inline-block w-24 py-1.5 ${item.status === 'Selesai' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'} text-[10px] font-bold rounded-full uppercase tracking-tighter border text-center">
+                                <span class="inline-block w-24 py-1.5 ${item.status === 'Selesai' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'} text-[10px] font-bold rounded-full uppercase border text-center">
                                     ${item.status}
                                 </span>
                             </div>
                         </td>
                     </tr>
                 `).join('');
-            } catch (error) {
-                loading.innerText = "Gagal memuat data dari server.";
-                console.error(error);
+            } catch (e) {
+                document.getElementById('loader').innerText = "Gagal memuat data dari server.";
             }
         }
-
-        window.onload = loadRiwayat;
+        window.onload = loadData;
     </script>
 </body>
 </html>
