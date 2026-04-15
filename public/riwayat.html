@@ -61,13 +61,6 @@
                                     <th class="p-5">Instansi</th>
                                     <th class="p-5">Judul & Kategori</th>
                                     <th class="p-5 text-center">Status</th>
-                                    <td class="p-5 text-center">
-    <div class="flex justify-center items-center h-full">
-        <span class="inline-flex items-center justify-center px-3 py-1 ${item.status === 'Selesai' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-yellow-100 text-yellow-700 border border-yellow-200'} text-[10px] font-bold rounded-full uppercase tracking-tighter min-w-[80px]">
-            ${item.status}
-        </span>
-    </div>
-</td>
                                 </tr>
                             </thead>
                             <tbody id="consultList" class="divide-y divide-gray-50">
@@ -105,7 +98,28 @@
                 emptyState.classList.remove('hidden');
                 return;
             }
-
+// Bagian Rendering Tabel di JavaScript
+tbody.innerHTML = data.reverse().map((item) => `
+    <tr class="hover:bg-gray-50 transition border-b">
+        <td class="p-5 text-xs text-gray-400 align-middle">${item.waktu}</td>
+        <td class="p-5 font-bold text-sm text-gray-700 align-middle">${item.opd}</td>
+        <td class="p-5 align-middle">
+            <div class="text-sm font-bold text-gray-800">${item.judul}</div>
+            <div class="text-[10px] text-gray-400 uppercase font-semibold">${item.kategori}</div>
+        </td>
+        <td class="p-5 text-center align-middle">
+            <div class="flex justify-center">
+                <span class="inline-block w-24 py-1 text-[10px] font-bold rounded-full uppercase tracking-tighter text-center border
+                    ${item.status === 'Selesai' 
+                        ? 'bg-green-100 text-green-700 border-green-200' 
+                        : 'bg-yellow-100 text-yellow-700 border-yellow-200'}">
+                    ${item.status}
+                </span>
+            </div>
+        </td>
+    </tr>
+`).join('');
+        }
             emptyState.classList.add('hidden');
             listTable.innerHTML = data.map((item, index) => `
                 <tr class="hover:bg-gray-50 transition">
