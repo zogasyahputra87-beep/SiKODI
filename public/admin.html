@@ -82,16 +82,4 @@
 
         function logout() {
             if(confirm("Apakah Anda yakin ingin keluar dari Admin Panel?")) {
-                sessionStorage.clear();
-                window.location.href = 'login.html';
-            }
-        }
-
-        async function fetchAdmin() {
-            const loader = document.getElementById('loader');
-            const adminBody = document.getElementById('adminBody');
-            loader.classList.remove('hidden');
-            loader.innerText = "Memperbarui data dari Google Sheets...";
-            
-            try {
-                const
+                sessionStorage
