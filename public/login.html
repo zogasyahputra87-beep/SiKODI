@@ -13,14 +13,26 @@
     
     <style>
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            /* PERBAIKAN: Background Gambar Kantor dengan Overlay Gelap */
+            background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.75)), 
+                        url('../pages/gambar_kantor.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        /* Efek sedikit transparan pada kartu (Glassmorphism) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
         }
     </style>
 </head>
 <body class="h-screen flex items-center justify-center p-6">
 
-    <div id="loginCard" class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate__animated animate__fadeInDown">
-        <div class="p-8 text-center bg-gray-50 border-b">
+    <div id="loginCard" class="glass-card w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate__animated animate__fadeInDown">
+        <div class="p-8 text-center bg-white/50 border-b border-gray-100">
             <div class="mb-4 flex justify-center">
                 <img src="../pages/logo_kab.png" 
                      alt="Logo Kabupaten Malang" 
@@ -45,7 +57,7 @@
             </button>
         </form>
         
-        <div class="p-6 bg-gray-50 text-center border-t">
+        <div class="p-6 bg-gray-50/50 text-center border-t border-gray-100">
             <p class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Versi 1.0 - Aktualisasi CPNS</p>
             <p class="text-[8px] text-gray-300 uppercase mt-1">Ananda Zoga Syahputra, S.Tr.I.P.</p>
         </div>
@@ -63,59 +75,3 @@
             e.preventDefault();
             
             const userIn = document.getElementById('username').value;
-            const passIn = document.getElementById('password').value;
-            const btn = document.getElementById('loginBtn');
-            const card = document.getElementById('loginCard');
-
-            // Efek Loading
-            btn.innerHTML = `<span class="inline-block animate-spin mr-2">⏳</span> MEMPROSES...`;
-            btn.disabled = true;
-
-            // Cari Akun
-            const foundAccount = accounts.find(acc => acc.user === userIn && acc.pass === passIn);
-
-            setTimeout(() => {
-                if (foundAccount) {
-                    // Simpan status login
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    sessionStorage.setItem('userRole', foundAccount.role);
-                    sessionStorage.setItem('userName', foundAccount.user);
-
-                    // Animasi Berhasil
-                    Swal.fire({
-                        title: 'LOGIN BERHASIL',
-                        text: 'Selamat Datang di SiCODI',
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        customClass: { popup: 'rounded-3xl' }
-                    }).then(() => {
-                        document.body.classList.add('animate__animated', 'animate__fadeOut');
-                        setTimeout(() => {
-                            window.location.href = foundAccount.target;
-                        }, 500);
-                    });
-
-                } else {
-                    // Jika Gagal
-                    btn.innerHTML = "Masuk ke Sistem";
-                    btn.disabled = false;
-                    
-                    // Reset animasi agar bisa goyang lagi
-                    card.classList.remove('animate__fadeInDown', 'animate__headShake');
-                    void card.offsetWidth; // Trigger reflow
-                    card.classList.add('animate__headShake');
-                    
-                    Swal.fire({
-                        title: 'AKSES DITOLAK',
-                        text: 'Username atau Password salah!',
-                        icon: 'error',
-                        confirmButtonColor: '#1F2937',
-                        customClass: { popup: 'rounded-3xl' }
-                    });
-                }
-            }, 800);
-        });
-    </script>
-</body>
-</html>
