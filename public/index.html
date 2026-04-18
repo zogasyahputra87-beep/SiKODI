@@ -6,6 +6,15 @@
     <title>Dashboard | SiCODI Inspektorat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="manifest.json">
+    <style>
+        /* Mencegah seleksi teks agar data tidak mudah disalin */
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* Sembunyikan body sampai pengecekan login selesai */
+        body { display: none; }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 overflow-hidden">
 
@@ -94,23 +103,34 @@
     </div>
 
     <script>
-        // 1. CEK LOGIN
-        if (sessionStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = 'login.html';
-        }
+        // --- 1. FUNGSI KEAMANAN & AUTENTIKASI ---
+        (function() {
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            } else {
+                document.body.style.display = "block";
+            }
+        })();
 
+        // Mematikan Klik Kanan
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Mematikan Shortcut Inspect Element & Source Code
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+        };
+
+        // --- 2. LOGIKA SIDEBAR & USER ---
         document.getElementById('display-user').innerText = sessionStorage.getItem('userName') || 'User';
 
-        // 2. CONFIG BACKEND
-        const API_URL = "https://script.google.com/macros/s/AKfycbx7Z5WIzD7sztiuaZj3woxst1TW0vCnQ3bddyquC4xUFmPZ9DKZqeyfewi6XSxkSJEN/exec";
-
-        // 3. LOGIKA SIDEBAR
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
             document.getElementById('overlay').classList.toggle('hidden');
         }
 
-        // 4. LOGOUT (PERBAIKAN)
         function logout() {
             if(confirm("Apakah Anda yakin ingin keluar?")) {
                 sessionStorage.clear();
@@ -118,7 +138,9 @@
             }
         }
 
-        // 5. UPDATE STATISTIK
+        // --- 3. DATA & BACKEND ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbx7Z5WIzD7sztiuaZj3woxst1TW0vCnQ3bddyquC4xUFmPZ9DKZqeyfewi6XSxkSJEN/exec";
+
         async function updateStats() {
             try {
                 const response = await fetch(API_URL);
@@ -142,12 +164,10 @@
             }
         }
 
-        // PWA Service Worker
+        // Service Worker untuk PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('SW Registered'))
-                    .catch(err => console.log('SW Failed', err));
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Failed', err));
             });
         }
 
