@@ -19,6 +19,9 @@
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
+            /* Mencegah seleksi teks */
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .glass-card {
@@ -41,7 +44,7 @@
         <form id="loginForm" class="p-8 space-y-5">
             <div>
                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Username</label>
-                <input type="text" id="username" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Masukkan username" required>
+                <input type="text" id="username" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Masukkan username" required autocomplete="off">
             </div>
             <div>
                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Password</label>
@@ -60,6 +63,22 @@
     </div>
 
     <script>
+        // --- 1. FUNGSI KEAMANAN TAMBAHAN ---
+        
+        // Mematikan Klik Kanan
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Mematikan Shortcut Keyboard (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U)
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+        };
+
+        // --- 2. LOGIKA LOGIN ---
         const accounts = [
             { user: "admin", pass: "inspektorat2026", role: "admin", target: "admin.html" },
             { user: "malangkab", pass: "malangkab123", role: "user", target: "index.html" },
@@ -81,7 +100,6 @@
 
             setTimeout(() => {
                 if (foundAccount) {
-                    // --- PROTEKSI: SIMPAN KUNCI AKSES ---
                     sessionStorage.setItem('isLoggedIn', 'true');
                     sessionStorage.setItem('userRole', foundAccount.role);
                     sessionStorage.setItem('userName', foundAccount.user);
