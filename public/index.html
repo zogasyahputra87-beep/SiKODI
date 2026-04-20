@@ -16,7 +16,7 @@
             -webkit-user-select: none;
             display: none; 
         }
-        /* Bingkai halus untuk foto profil pengembang */
+        /* Bingkai gradasi untuk foto profil */
         .profile-ring {
             padding: 2px;
             background: linear-gradient(to bottom right, #3b82f6, #1e40af);
@@ -32,7 +32,7 @@
                 <img src="../pages/logo_kab.png" alt="Logo Kab Malang" class="w-14 mb-3 drop-shadow-md">
                 <div class="text-center">
                     <h1 class="text-xl font-bold text-white tracking-tight">SiCODI</h1>
-                    <p class="text-[9px] text-gray-500 uppercase tracking-widest leading-tight">Inspektorat Daerah<br>Kabupaten Malang</p>
+                    <p class="text-[9px] text-gray-500 uppercase tracking-widest leading-tight text-center">Inspektorat Daerah<br>Kabupaten Malang</p>
                 </div>
                 <button onclick="toggleSidebar()" class="md:hidden absolute top-4 right-4 text-gray-400">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -52,12 +52,16 @@
             </nav>
 
             <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50">
-                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700">
-                    <img src="../pages/zoga.jpg" alt="Ananda Zoga" class="w-full h-full object-cover rounded-full">
+                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700 flex items-center justify-center">
+                    <img src="../pages/zoga.jpg" 
+                         alt="Ananda Zoga" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                         class="w-full h-full object-cover rounded-full">
+                    <div class="hidden w-full h-full items-center justify-center text-xs font-bold text-white">AZ</div>
                 </div>
                 <div class="text-center">
                     <p class="text-[9px] text-blue-400 uppercase font-black tracking-tighter mb-1">Pengembang</p>
-                    <p class="text-[11px] font-bold text-gray-100 leading-tight uppercase">Ananda Zoga Syahputra, S.Tr.I.P.</p>
+                    <p class="text-[11px] font-bold text-gray-100 leading-tight uppercase text-center">Ananda Zoga Syahputra, S.Tr.I.P.</p>
                 </div>
                 <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition active:scale-95">
                     Keluar Sistem
@@ -66,9 +70,8 @@
         </aside>
 
         <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
-
         <main class="flex-1 flex flex-col overflow-y-auto">
-            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-6 h-20 flex-shrink-0">
+             <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-6 h-20 flex-shrink-0">
                 <div class="flex items-center">
                     <button onclick="toggleSidebar()" class="md:hidden mr-4 p-2 bg-gray-100 rounded-lg text-gray-600">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
@@ -85,20 +88,18 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
                         <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4 text-2xl">📋</div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Konsultasi</p>
-                        <h3 id="stat-total" class="text-4xl font-black text-gray-800 animate-pulse">...</h3>
+                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Total Konsultasi</p>
+                        <h3 id="stat-total" class="text-4xl font-black text-gray-800 animate-pulse text-center">...</h3>
                     </div>
-
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
                         <div class="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-full flex items-center justify-center mb-4 text-2xl">⏳</div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Dalam Proses</p>
-                        <h3 id="stat-pending" class="text-4xl font-black text-yellow-600 animate-pulse">...</h3>
+                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Dalam Proses</p>
+                        <h3 id="stat-pending" class="text-4xl font-black text-yellow-600 animate-pulse text-center">...</h3>
                     </div>
-
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
                         <div class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-4 text-2xl">✅</div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Telah Selesai</p>
-                        <h3 id="stat-done" class="text-4xl font-black text-green-600 animate-pulse">...</h3>
+                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Telah Selesai</p>
+                        <h3 id="stat-done" class="text-4xl font-black text-green-600 animate-pulse text-center">...</h3>
                     </div>
                 </div>
 
@@ -117,7 +118,7 @@
     </div>
 
     <script>
-        // Script tetap sama sesuai fungsi sebelumnya
+        // Logika script kamu tetap sama dan sudah benar
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'login.html';
