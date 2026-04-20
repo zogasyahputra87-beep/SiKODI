@@ -29,7 +29,7 @@
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1F2937] text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
             
             <div class="p-6 border-b border-gray-700 flex flex-col items-center">
-                <img src="logo.png" alt="Logo Kab Malang" class="w-14 mb-3 drop-shadow-md">
+                <img src="../pages/logo_kab.png" alt="Logo Kab Malang" class="w-14 mb-3 drop-shadow-md">
                 <div class="text-center">
                     <h1 class="text-xl font-bold text-white tracking-tight">SiCODI</h1>
                     <p class="text-[9px] text-gray-500 uppercase tracking-widest leading-tight">Inspektorat Daerah<br>Kabupaten Malang</p>
@@ -52,8 +52,8 @@
             </nav>
 
             <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50">
-                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden">
-                    <img src="zoga.jpg" alt="Ananda Zoga" class="w-full h-full object-cover rounded-full bg-gray-700 text-[8px] text-center italic">
+                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700">
+                    <img src="../pages/zoga.jpg" alt="Ananda Zoga" class="w-full h-full object-cover rounded-full">
                 </div>
                 <div class="text-center">
                     <p class="text-[9px] text-blue-400 uppercase font-black tracking-tighter mb-1">Pengembang</p>
@@ -117,7 +117,7 @@
     </div>
 
     <script>
-        // 1. KEAMANAN & AUTENTIKASI
+        // Script tetap sama sesuai fungsi sebelumnya
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'login.html';
@@ -133,7 +133,6 @@
             if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
         };
 
-        // 2. LOGIKA UI
         document.getElementById('display-user').innerText = sessionStorage.getItem('userName') || 'User';
 
         function toggleSidebar() {
@@ -162,39 +161,26 @@
             })
         }
 
-        // 3. BACKEND STATS
         const API_URL = "https://script.google.com/macros/s/AKfycbyX-a7p08hDx5yT-GCznvANR0Ttc_XT5CE5QtBRR_JVYuR5V4XMTdrYNoppQQhLLf9b/exec";
 
         async function updateStats() {
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
-                
                 const total = data.length;
                 const pending = data.filter(item => item.status === 'Menunggu' || item.status === '-' || item.status === '').length;
                 const done = data.filter(item => item.status === 'Selesai').length;
 
                 document.getElementById('stat-total').innerText = total;
                 document.getElementById('stat-total').classList.remove('animate-pulse');
-                
                 document.getElementById('stat-pending').innerText = pending;
                 document.getElementById('stat-pending').classList.remove('animate-pulse');
-                
                 document.getElementById('stat-done').innerText = done;
                 document.getElementById('stat-done').classList.remove('animate-pulse');
-
             } catch (error) {
                 console.error("Gagal mengambil data statistik:", error);
-                ['stat-total', 'stat-pending', 'stat-done'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) {
-                        el.innerText = "0";
-                        el.classList.remove('animate-pulse');
-                    }
-                });
             }
         }
-
         window.onload = updateStats;
     </script>
 </body>
