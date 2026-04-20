@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel | SiCODI</title>
     
+    <link rel="icon" type="image/png" href="../pages/logo_kab.png">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -18,27 +20,48 @@
         .custom-scrollbar::-webkit-scrollbar { height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Bingkai gradasi halus untuk foto profil pengembang */
+        .profile-ring {
+            padding: 2px;
+            background: linear-gradient(to bottom right, #3b82f6, #1e40af);
+        }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
+<body class="bg-gray-100 font-sans text-gray-800 overflow-hidden">
     <div class="flex h-screen overflow-hidden relative">
         
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-gray-900 text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
-            <div class="p-8 border-b border-gray-700 flex justify-between items-center">
-                <div class="text-center w-full">
-                    <h1 class="text-xl font-black text-white">ADMIN PANEL</h1>
-                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Inspektorat Kab. Malang</p>
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1F2937] text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
+            
+            <div class="p-6 border-b border-gray-700 flex flex-col items-center">
+                <img src="../pages/logo_kab.png" alt="Logo Kab Malang" class="w-14 mb-3 drop-shadow-md">
+                <div class="text-center">
+                    <h1 class="text-xl font-bold text-white tracking-tight uppercase">Admin Panel</h1>
+                    <p class="text-[9px] text-gray-500 uppercase tracking-widest leading-tight text-center">Inspektorat Daerah<br>Kabupaten Malang</p>
                 </div>
-                <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white">
+                <button onclick="toggleSidebar()" class="md:hidden absolute top-4 right-4 text-gray-400">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
+
             <nav class="flex-1 mt-6 px-4 space-y-2">
                 <div class="bg-blue-600/10 text-blue-400 p-3 rounded-lg text-sm font-bold border-l-4 border-blue-500">🛡️ Kelola Konsultasi</div>
                 <a href="index.html" class="block p-3 text-gray-400 hover:text-white text-[10px] uppercase font-bold tracking-tighter transition">← Dashboard User</a>
             </nav>
-            <div class="p-6 border-t border-gray-800">
-                <button onclick="logout()" class="text-[10px] text-red-400 font-bold uppercase tracking-widest bg-red-900/20 px-4 py-2 rounded-lg border border-red-900/30 w-full transition active:scale-95">Keluar</button>
+
+            <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50">
+                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700 flex items-center justify-center">
+                    <img src="../pages/zoga.jpg" 
+                         alt="Ananda Zoga" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                         class="w-full h-full object-cover rounded-full">
+                    <div class="hidden w-full h-full items-center justify-center text-xs font-bold text-white uppercase">AZ</div>
+                </div>
+                <div class="text-center">
+                    <p class="text-[9px] text-blue-400 uppercase font-black tracking-tighter mb-1">Pengembang</p>
+                    <p class="text-[11px] font-bold text-gray-100 leading-tight uppercase text-center">Ananda Zoga Syahputra, S.Tr.I.P.</p>
+                </div>
+                <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition active:scale-95">Keluar</button>
             </div>
         </aside>
 
@@ -155,28 +178,28 @@
                     <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
                         <td class="p-5 align-top w-48">
                             <div class="text-[10px] text-blue-600 font-bold mb-1 uppercase italic tracking-tighter">📅 ${item.waktu}</div>
-                            <div class="font-bold text-gray-800 leading-tight uppercase text-xs">${item.opd}</div>
+                            <div class="font-bold text-gray-800 leading-tight uppercase text-xs text-left">${item.opd}</div>
                         </td>
                         <td class="p-5 align-top">
-                            <div class="font-bold text-gray-800 mb-1">${item.judul}</div>
-                            <div class="text-xs text-gray-500 mb-3 bg-gray-50 p-3 rounded-lg border border-gray-100 italic">
+                            <div class="font-bold text-gray-800 mb-1 text-left">${item.judul}</div>
+                            <div class="text-xs text-gray-500 mb-3 bg-gray-50 p-3 rounded-lg border border-gray-100 italic text-left">
                                 "${item.issue}"
                             </div>
-                            <div class="mb-4">
+                            <div class="mb-4 text-left">
                                 ${lampiran && lampiran !== "-" ? 
                                     `<a href="${lampiran}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg text-[10px] font-bold hover:bg-blue-700 transition shadow-sm uppercase active:scale-95">📂 Buka Lampiran</a>` : 
                                     `<span class="text-[9px] text-gray-400 italic">Tanpa lampiran</span>`
                                 }
                             </div>
                             ${status === 'Selesai' ? 
-                                `<div class="p-3 bg-green-50 rounded-xl border border-green-200 text-xs text-gray-700 italic">
-                                    <span class="block font-bold text-green-700 text-[9px] uppercase mb-1">Jawaban Anda:</span> "${item.jawaban}"
+                                `<div class="p-3 bg-green-50 rounded-xl border border-green-200 text-xs text-gray-700 italic text-left">
+                                    <span class="block font-bold text-green-700 text-[9px] uppercase mb-1 text-left">Jawaban Anda:</span> "${item.jawaban}"
                                 </div>` : 
                                 `<textarea id="reply-${id}" class="w-full p-3 text-xs border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" rows="2" placeholder="Tulis tanggapan resmi di sini..."></textarea>`
                             }
                         </td>
                         <td class="p-5 text-center align-top pt-8 w-32">
-                            <span class="inline-block w-24 py-1 text-[9px] font-bold rounded-full border ${status === 'Selesai' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'} uppercase">
+                            <span class="inline-block w-24 py-1 text-[9px] font-bold rounded-full border ${status === 'Selesai' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'} uppercase text-center">
                                 ${status}
                             </span>
                         </td>
@@ -196,7 +219,6 @@
             }
         }
 
-        // Fitur Mengembalikan Status ke Menunggu (Ubah Jawaban)
         function batalSelesai(rowId) {
             Swal.fire({
                 title: 'Ubah Jawaban?',
