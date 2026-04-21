@@ -25,6 +25,22 @@
             padding: 2px;
             background: linear-gradient(to bottom right, #3b82f6, #1e40af);
         }
+
+        /* Styling Preview Dokumen */
+        .preview-container {
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+            background: #f9fafb;
+        }
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 overflow-hidden">
@@ -138,6 +154,22 @@
                         ? `<div class="mt-2 flex flex-col space-y-1"><span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[9px] font-black uppercase border border-purple-200 w-fit">Offline</span><span class="text-[9px] text-purple-600 font-bold italic">📅 ${item.tgl_offline || '-'}</span></div>`
                         : `<div class="mt-2"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px] font-black uppercase border border-blue-200 w-fit">Online</span></div>`;
 
+                    // LOGIKA PREVIEW DOKUMEN TINDAK LANJUT
+                    let previewTL = "";
+                    const regexLink = /Link Dokumen: (https?:\/\/[^\s]+)/;
+                    const match = item.bukti_tl ? item.bukti_tl.match(regexLink) : null;
+                    const linkFile = match ? match[1] : null;
+
+                    if (linkFile) {
+                        // Mengubah link Drive menjadi link preview (mode embed)
+                        const previewUrl = linkFile.replace('/view?usp=drivesdk', '/preview').replace('/view', '/preview');
+                        previewTL = `
+                            <div class="preview-container">
+                                <iframe src="${previewUrl}" class="preview-iframe"></iframe>
+                            </div>
+                        `;
+                    }
+
                     // PANEL TINDAK LANJUT (Monitoring TL)
                     let tlPanel = "";
                     if (isTerjawab) {
@@ -145,7 +177,14 @@
                             tlPanel = `
                                 <div class="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-xl animate__animated animate__fadeIn">
                                     <p class="text-[10px] font-bold text-orange-700 uppercase mb-2">🚩 Verifikasi Bukti TL OPD:</p>
-                                    <div class="text-xs text-gray-700 mb-3 bg-white p-3 rounded-lg border border-orange-100 italic">"${item.bukti_tl}"</div>
+                                    
+                                    <div class="text-xs text-gray-700 mb-3 bg-white p-3 rounded-lg border border-orange-100">
+                                        <p class="font-bold text-orange-600 mb-1 text-[10px] uppercase">Penjelasan:</p>
+                                        <span class="italic">"${item.bukti_tl.split('|')[0] || item.bukti_tl}"</span>
+                                    </div>
+
+                                    ${previewTL}
+
                                     <textarea id="catatan-tl-${id}" class="w-full p-3 text-xs border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none mb-3" rows="2" placeholder="Berikan catatan verifikasi (Apresiasi atau Alasan Perbaikan)..."></textarea>
                                     <div class="flex space-x-2">
                                         <button onclick="prosesVerifikasi(${id}, 'Tuntas')" class="flex-1 bg-teal-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-teal-700 transition shadow-md">Terima (Tuntas)</button>
