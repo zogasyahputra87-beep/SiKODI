@@ -3,9 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat | SiCODI Inspektorat</title>
     
+    <title>Riwayat Konsultasi | SiCODI Inspektorat Kabupaten Malang</title>
+    <meta name="description" content="Lihat riwayat dan pantau alur tindak lanjut konsultasi digital Anda di Inspektorat Daerah Kabupaten Malang.">
+    <meta name="keywords" content="Riwayat SiCODI, Konsultasi Digital, Inspektorat Malang, Monitoring Tindak Lanjut">
+
+    <meta property="og:title" content="Riwayat Konsultasi - SiCODI">
+    <meta property="og:description" content="Pantau status dan alur penyelesaian konsultasi Anda secara real-time.">
+    <meta property="og:image" content="https://sicodi-malang.vercel.app/pages/logo_kab.png">
+    <meta property="og:type" content="website">
+
     <link rel="icon" type="image/png" href="../pages/logo_kab.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1F2937">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -234,7 +244,6 @@
                        </div>`
                     : `<div class="mt-2"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[8px] font-black uppercase border border-blue-200">Online</span></div>`;
 
-                // PREVIEW DOKUMEN TINDAK LANJUT (TL)
                 let previewTL = "";
                 const regexLink = /Link Dokumen: (https?:\/\/[^\s]+)/;
                 const match = item.bukti_tl ? item.bukti_tl.match(regexLink) : null;
@@ -243,7 +252,6 @@
                     previewTL = `<div class="preview-container"><iframe src="${previewUrl}" class="preview-iframe"></iframe></div>`;
                 }
 
-                // PREVIEW DOKUMEN AJUAN AWAL (Jika format link Drive)
                 let previewAjuan = "";
                 if (item.lampiran && item.lampiran.includes('drive.google.com')) {
                     const previewAjuanUrl = item.lampiran.replace('/view?usp=drivesdk', '/preview').replace('/view', '/preview');
@@ -252,7 +260,6 @@
 
                 let timelineContent = "";
                 
-                // Step 1: Ajuan & Tanggapan
                 timelineContent += `
                     <div class="timeline-step timeline-success">
                         <p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 1: Pengajuan & Tanggapan</p>
@@ -267,7 +274,6 @@
                     </div>
                 `;
 
-                // Step 2: Monitoring Tindak Lanjut
                 if(isTerjawab) {
                     let tlStatusText = "";
                     let tlClass = "timeline-active";
