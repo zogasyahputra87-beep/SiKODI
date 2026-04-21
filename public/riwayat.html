@@ -115,12 +115,16 @@
         <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
         <main class="flex-1 flex flex-col overflow-y-auto">
-            <header class="bg-white border-b p-4 px-6 md:px-8 h-20 flex justify-between items-center shadow-sm flex-shrink-0">
-                <div class="flex items-center">
+            <header class="bg-white border-b p-4 px-6 md:px-8 h-20 flex justify-between items-center shadow-sm flex-shrink-0 sticky top-0 z-30">
+                <div class="flex items-center flex-1">
                     <button onclick="toggleSidebar()" class="md:hidden mr-4 p-2 bg-gray-100 rounded-lg text-gray-600">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
-                    <h2 class="text-sm md:text-lg font-bold text-gray-800 uppercase tracking-wide">Daftar Riwayat</h2>
+                    <div class="relative w-full max-w-md hidden md:block">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">🔍</span>
+                        <input type="text" id="searchInput" onkeyup="filterRiwayat()" placeholder="Cari Instansi atau Judul Konsultasi..." class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-gray-50 text-xs placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition shadow-sm">
+                    </div>
+                    <h2 class="md:hidden text-sm font-bold text-gray-800 uppercase tracking-wide">Riwayat</h2>
                 </div>
                 
                 <div class="flex items-center space-x-2 md:space-x-4">
@@ -133,6 +137,10 @@
             </header>
 
             <div class="p-4 md:p-8">
+                <div class="mb-4 md:hidden">
+                    <input type="text" id="searchInputMobile" onkeyup="filterRiwayatMobile()" placeholder="Cari Instansi atau Judul..." class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="overflow-x-auto custom-scrollbar">
                         <table class="w-full text-left border-collapse min-w-[850px]">
@@ -154,6 +162,8 @@
     </div>
 
     <script>
+        let rawRiwayat = []; // Variabel untuk menyimpan data asli agar pencarian cepat
+
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'login.html';
@@ -179,99 +189,98 @@
         async function loadData() {
             try {
                 const res = await fetch(API_URL);
-                const data = await res.json();
-                const listTable = document.getElementById('listTable');
-                const loader = document.getElementById('loader');
-                
-                if (!data || data.length === 0) {
-                    loader.innerText = "Belum ada riwayat.";
-                    return;
-                }
-                loader.classList.add('hidden');
-                
-                listTable.innerHTML = data.reverse().map(item => {
-                    const isTerjawab = item.status === 'Terjawab' || item.status === 'Selesai';
-                    const isPending = item.status === 'Menunggu';
-                    
-                    const metodeBadge = item.metode === 'Offline' 
-                        ? `<div class="mt-2 inline-flex flex-col space-y-1">
-                             <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[8px] font-black uppercase border border-purple-200">Offline</span>
-                             <span class="text-[9px] text-purple-600 font-bold italic">📅 ${item.tgl_offline || '-'}</span>
-                           </div>`
-                        : `<div class="mt-2"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[8px] font-black uppercase border border-blue-200">Online</span></div>`;
-
-                    // LOGIKA ALUR TIMELINE (PENGAJUAN -> JAWABAN -> TINDAK LANJUT)
-                    let timelineContent = "";
-                    
-                    // Step 1: Jawaban
-                    timelineContent += `
-                        <div class="timeline-step ${isTerjawab ? 'timeline-success' : 'timeline-active'}">
-                            <p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 1: Tanggapan Auditor</p>
-                            <p class="text-xs text-gray-700 mt-1">${isTerjawab ? `<span class="text-green-600 font-medium">Dijawab pada ${item.waktu_jawaban}</span><br><span class="italic">"${item.jawaban}"</span>` : 'Menunggu tanggapan dari Inspektorat...'}</p>
-                        </div>
-                    `;
-
-                    // Step 2: Tindak Lanjut & Verifikasi
-                    if(isTerjawab) {
-                        let tlStatusText = "";
-                        let tlClass = "timeline-active";
-                        
-                        if(item.status_tl === "Belum TL") {
-                            tlStatusText = "Menunggu OPD mengirimkan bukti tindak lanjut.";
-                        } else if(item.status_tl === "Menunggu Verifikasi") {
-                            tlStatusText = `<span class="text-orange-600 font-medium">Bukti terkirim pada ${item.waktu_tl}</span><br>Menunggu verifikasi kesesuaian oleh auditor.`;
-                            tlClass = "timeline-active";
-                        } else if(item.status_tl === "Perlu Perbaikan") {
-                            tlStatusText = `<span class="text-red-600 font-medium font-bold">⚠️ Perlu Perbaikan:</span> ${item.catatan_admin_tl}`;
-                            tlClass = "timeline-error";
-                        } else if(item.status_tl === "Tuntas") {
-                            tlStatusText = `<span class="text-teal-600 font-medium font-bold">✅ Sesuai (Tuntas):</span> Diverifikasi pada ${item.waktu_verifikasi}. <br><span class="italic text-gray-500">Catatan: ${item.catatan_admin_tl}</span>`;
-                            tlClass = "timeline-success";
-                        }
-
-                        timelineContent += `
-                            <div class="timeline-step ${tlClass}">
-                                <p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 2: Monitoring Tindak Lanjut</p>
-                                <p class="text-xs text-gray-700 mt-1">${tlStatusText}</p>
-                            </div>
-                        `;
-                    }
-
-                    // Form Tombol Tindak Lanjut
-                    let actionBtn = "";
-                    if (isTerjawab && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")) {
-                        actionBtn = `<button onclick="formTL(${item.id})" class="mt-2 w-full py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition shadow-sm animate__animated animate__pulse animate__infinite">Kirim Laporan & Bukti TL</button>`;
-                    }
-
-                    return `
-                    <tr class="hover:bg-gray-50/50 transition border-b border-gray-50">
-                        <td class="p-5 text-[9px] text-gray-400 align-top pt-6 col-waktu">${item.waktu}</td>
-                        <td class="p-5 font-bold text-sm text-gray-700 align-top pt-6">${item.opd}${metodeBadge}</td>
-                        <td class="p-5 align-top pt-6">
-                            <div class="text-sm font-bold text-gray-800">${item.judul}</div>
-                            <div class="text-[10px] text-blue-500 font-semibold italic mb-4 uppercase">${item.kategori}</div>
-                            
-                            <div class="mb-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
-                                ${timelineContent}
-                            </div>
-
-                            <div class="flex space-x-2 mb-3">
-                                ${item.lampiran && item.lampiran !== '-' ? `<a href="${item.lampiran}" target="_blank" class="px-3 py-1.5 bg-gray-100 text-gray-600 border border-gray-200 rounded-lg text-[9px] font-bold uppercase tracking-wider">📂 Lampiran Awal</a>` : ''}
-                                ${isPending ? `<button onclick="batalkanKonsultasi('${item.id}')" class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-[9px] font-bold uppercase tracking-wider">❌ Batalkan</button>` : ''}
-                            </div>
-                            
-                            ${actionBtn}
-                        </td>
-                        <td class="p-5 text-center align-top pt-6">
-                            <span class="inline-block w-24 py-1.5 ${item.status_tl === 'Tuntas' ? 'bg-teal-100 text-teal-700 border-teal-200' : (isTerjawab ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200')} text-[9px] font-bold rounded-full uppercase border">
-                                ${item.status_tl === 'Tuntas' ? 'Tuntas' : item.status}
-                            </span>
-                        </td>
-                    </tr>`;
-                }).join('');
+                rawRiwayat = await res.json();
+                renderRiwayat(rawRiwayat);
             } catch (e) {
                 document.getElementById('loader').innerText = "⚠️ Gagal memuat data.";
             }
+        }
+
+        // FUNGSI RENDER TABEL RIWAYAT
+        function renderRiwayat(dataToRender) {
+            const listTable = document.getElementById('listTable');
+            const loader = document.getElementById('loader');
+            
+            if (!dataToRender || dataToRender.length === 0) {
+                listTable.innerHTML = "";
+                loader.classList.remove('hidden');
+                loader.innerText = "Data tidak ditemukan.";
+                return;
+            }
+            loader.classList.add('hidden');
+            
+            listTable.innerHTML = [...dataToRender].reverse().map(item => {
+                const isTerjawab = item.status === 'Terjawab' || item.status === 'Selesai';
+                const isPending = item.status === 'Menunggu';
+                
+                const metodeBadge = item.metode === 'Offline' 
+                    ? `<div class="mt-2 inline-flex flex-col space-y-1">
+                         <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[8px] font-black uppercase border border-purple-200">Offline</span>
+                         <span class="text-[9px] text-purple-600 font-bold italic">📅 ${item.tgl_offline || '-'}</span>
+                       </div>`
+                    : `<div class="mt-2"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[8px] font-black uppercase border border-blue-200">Online</span></div>`;
+
+                let timelineContent = `
+                    <div class="timeline-step ${isTerjawab ? 'timeline-success' : 'timeline-active'}">
+                        <p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 1: Tanggapan Auditor</p>
+                        <p class="text-xs text-gray-700 mt-1">${isTerjawab ? `<span class="text-green-600 font-medium">Dijawab pada ${item.waktu_jawaban}</span><br><span class="italic">"${item.jawaban}"</span>` : 'Menunggu tanggapan dari Inspektorat...'}</p>
+                    </div>
+                `;
+
+                if(isTerjawab) {
+                    let tlStatusText = "";
+                    let tlClass = "timeline-active";
+                    if(item.status_tl === "Belum TL") tlStatusText = "Menunggu OPD mengirimkan bukti tindak lanjut.";
+                    else if(item.status_tl === "Menunggu Verifikasi") tlStatusText = `<span class="text-orange-600 font-medium">Bukti terkirim pada ${item.waktu_tl}</span><br>Menunggu verifikasi auditor.`;
+                    else if(item.status_tl === "Perlu Perbaikan") { tlStatusText = `<span class="text-red-600 font-medium font-bold">⚠️ Perlu Perbaikan:</span> ${item.catatan_admin_tl}`; tlClass = "timeline-error"; }
+                    else if(item.status_tl === "Tuntas") { tlStatusText = `<span class="text-teal-600 font-medium font-bold">✅ Sesuai (Tuntas):</span> Diverifikasi pada ${item.waktu_verifikasi}. <br><span class="italic text-gray-500">Catatan: ${item.catatan_admin_tl}</span>`; tlClass = "timeline-success"; }
+
+                    timelineContent += `<div class="timeline-step ${tlClass}"><p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 2: Monitoring Tindak Lanjut</p><p class="text-xs text-gray-700 mt-1">${tlStatusText}</p></div>`;
+                }
+
+                let actionBtn = "";
+                if (isTerjawab && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")) {
+                    actionBtn = `<button onclick="formTL(${item.id})" class="mt-2 w-full py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition shadow-sm animate__animated animate__pulse animate__infinite">Kirim Laporan & Bukti TL</button>`;
+                }
+
+                return `<tr class="hover:bg-gray-50/50 transition border-b border-gray-50">
+                    <td class="p-5 text-[9px] text-gray-400 align-top pt-6 col-waktu">${item.waktu}</td>
+                    <td class="p-5 font-bold text-sm text-gray-700 align-top pt-6">${item.opd}${metodeBadge}</td>
+                    <td class="p-5 align-top pt-6">
+                        <div class="text-sm font-bold text-gray-800">${item.judul}</div>
+                        <div class="text-[10px] text-blue-500 font-semibold italic mb-4 uppercase">${item.kategori}</div>
+                        <div class="mb-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">${timelineContent}</div>
+                        <div class="flex space-x-2 mb-3">
+                            ${item.lampiran && item.lampiran !== '-' ? `<a href="${item.lampiran}" target="_blank" class="px-3 py-1.5 bg-gray-100 text-gray-600 border border-gray-200 rounded-lg text-[9px] font-bold uppercase tracking-wider">📂 Lampiran Awal</a>` : ''}
+                            ${isPending ? `<button onclick="batalkanKonsultasi('${item.id}')" class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-[9px] font-bold uppercase tracking-wider">❌ Batalkan</button>` : ''}
+                        </div>${actionBtn}
+                    </td>
+                    <td class="p-5 text-center align-top pt-6">
+                        <span class="inline-block w-24 py-1.5 ${item.status_tl === 'Tuntas' ? 'bg-teal-100 text-teal-700 border-teal-200' : (isTerjawab ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200')} text-[9px] font-bold rounded-full uppercase border">
+                            ${item.status_tl === 'Tuntas' ? 'Tuntas' : item.status}
+                        </span>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // LOGIKA FILTER SEARCH RIWAYAT
+        function filterRiwayat() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = rawRiwayat.filter(item => 
+                item.opd.toLowerCase().includes(query) || 
+                item.judul.toLowerCase().includes(query)
+            );
+            renderRiwayat(filtered);
+        }
+
+        function filterRiwayatMobile() {
+            const query = document.getElementById('searchInputMobile').value.toLowerCase();
+            const filtered = rawRiwayat.filter(item => 
+                item.opd.toLowerCase().includes(query) || 
+                item.judul.toLowerCase().includes(query)
+            );
+            renderRiwayat(filtered);
         }
 
         async function formTL(rowId) {
@@ -292,17 +301,13 @@
                 preConfirm: () => {
                     const penjelasan = document.getElementById('swal-input-ket').value;
                     const fileInput = document.getElementById('swal-input-file');
-                    if (!penjelasan.trim()) {
-                        Swal.showValidationMessage('Penjelasan tindakan wajib diisi!');
-                        return false;
-                    }
+                    if (!penjelasan.trim()) { Swal.showValidationMessage('Penjelasan tindakan wajib diisi!'); return false; }
                     return { penjelasan: penjelasan, file: fileInput.files[0] || null };
                 }
             });
 
             if (formValues) {
                 Swal.fire({ title: 'Mengirim Laporan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-                
                 if (formValues.file) {
                     const reader = new FileReader();
                     reader.onload = async (e) => {
@@ -310,9 +315,7 @@
                         await kirimDataTL(rowId, formValues.penjelasan, fileData, formValues.file.name, formValues.file.type);
                     };
                     reader.readAsDataURL(formValues.file);
-                } else {
-                    await kirimDataTL(rowId, formValues.penjelasan, "", "", "");
-                }
+                } else { await kirimDataTL(rowId, formValues.penjelasan, "", "", ""); }
             }
         }
 
@@ -320,24 +323,15 @@
             try {
                 await fetch(API_URL, {
                     method: 'POST',
-                    body: JSON.stringify({
-                        action: "kirim_tindak_lanjut",
-                        row: rowId,
-                        penjelasan: penjelasan,
-                        fileData: fileData,
-                        fileName: fileName,
-                        fileType: fileType
-                    })
+                    body: JSON.stringify({ action: "kirim_tindak_lanjut", row: rowId, penjelasan: penjelasan, fileData: fileData, fileName: fileName, fileType: fileType })
                 });
-                Swal.fire({ icon: 'success', title: 'Terkirim!', text: 'Laporan tindak lanjut sedang diverifikasi auditor.', timer: 2000, showConfirmButton: false });
+                Swal.fire({ icon: 'success', title: 'Terkirim!', timer: 2000, showConfirmButton: false });
                 refreshData();
-            } catch (e) {
-                Swal.fire('Gagal', 'Terjadi kesalahan sistem.', 'error');
-            }
+            } catch (e) { Swal.fire('Gagal', 'Terjadi kesalahan sistem.', 'error'); }
         }
 
         function batalkanKonsultasi(id) {
-            Swal.fire({ title: 'Hapus?', text: "Data akan dihapus.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then((result) => {
+            Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then((result) => {
                 if (result.isConfirmed) {
                     fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "hapus_konsultasi", id: id }) }).then(() => refreshData());
                 }
