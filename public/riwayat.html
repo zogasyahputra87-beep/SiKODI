@@ -6,12 +6,6 @@
     
     <title>Riwayat Konsultasi | SiCODI Inspektorat Kabupaten Malang</title>
     <meta name="description" content="Lihat riwayat dan pantau alur tindak lanjut konsultasi digital Anda di Inspektorat Daerah Kabupaten Malang.">
-    <meta name="keywords" content="Riwayat SiCODI, Konsultasi Digital, Inspektorat Malang, Monitoring Tindak Lanjut">
-
-    <meta property="og:title" content="Riwayat Konsultasi - SiCODI">
-    <meta property="og:description" content="Pantau status dan alur penyelesaian konsultasi Anda secara real-time.">
-    <meta property="og:image" content="https://sicodi-malang.vercel.app/pages/logo_kab.png">
-    <meta property="og:type" content="website">
 
     <link rel="icon" type="image/png" href="../pages/logo_kab.png">
     <link rel="manifest" href="manifest.json">
@@ -28,16 +22,6 @@
             display: none; 
         }
 
-        details[open] summary ~ * {
-            animation: sweep .3s ease-in-out;
-        }
-        @keyframes sweep {
-            0%    {opacity: 0; margin-top: -10px}
-            100%  {opacity: 1; margin-top: 0px}
-        }
-        
-        .col-waktu { width: 90px; min-width: 90px; }
-        
         .spin { animation: rotate 0.8s linear; }
         @keyframes rotate {
             from { transform: rotate(0deg); }
@@ -53,119 +37,69 @@
             background: linear-gradient(to bottom right, #3b82f6, #1e40af);
         }
 
-        .timeline-step {
-            position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 0.75rem;
-            border-left: 2px solid #e5e7eb;
-        }
-        .timeline-step::before {
-            content: '';
-            position: absolute;
-            left: -0.45rem;
-            top: 0.25rem;
-            width: 0.8rem;
-            height: 0.8rem;
-            border-radius: 50%;
-            background: #cbd5e1;
-            border: 2px solid #fff;
-        }
+        /* Timeline & Preview */
+        .timeline-step { position: relative; padding-left: 1.5rem; margin-bottom: 0.75rem; border-left: 2px solid #e5e7eb; }
+        .timeline-step::before { content: ''; position: absolute; left: -0.45rem; top: 0.25rem; width: 0.8rem; height: 0.8rem; border-radius: 50%; background: #cbd5e1; border: 2px solid #fff; }
         .timeline-active::before { background: #3b82f6; }
         .timeline-success::before { background: #10b981; }
         .timeline-error::before { background: #ef4444; }
-
-        .preview-container {
-            width: 100%;
-            height: 250px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #e5e7eb;
-            margin-top: 0.5rem;
-            background: #f9fafb;
-        }
-        .preview-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+        .preview-container { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; margin-top: 0.5rem; background: #f9fafb; }
+        .preview-iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 overflow-hidden">
 
     <div class="flex h-screen overflow-hidden relative">
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1F2937] text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
-            
             <div class="p-6 border-b border-gray-700 flex flex-col items-center">
-                <img src="../pages/logo_kab.png" alt="Logo Kab Malang" class="w-14 mb-3 drop-shadow-md">
+                <img src="../pages/logo_kab.png" alt="Logo" class="w-14 mb-3">
                 <div class="text-center">
                     <h1 class="text-xl font-bold text-white tracking-tight">SiCODI</h1>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight text-center">Inspektorat Daerah<br>Kabupaten Malang</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight">Inspektorat Daerah<br>Kabupaten Malang</p>
                 </div>
-                <button onclick="toggleSidebar()" class="md:hidden absolute top-4 right-4 text-gray-400">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
             </div>
             
             <nav class="flex-1 mt-6 px-4 space-y-1">
-                <a href="index.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">
-                    <span class="mr-3">📊</span> Dashboard
-                </a>
-                <a href="buat-konsultasi.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">
-                    <span class="mr-3">➕</span> Buat Konsultasi
-                </a>
-                <a href="riwayat.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-blue-500">
-                    <span class="mr-3">📂</span> Riwayat Konsultasi
-                </a>
+                <a href="index.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm"><span class="mr-3">📊</span> Dashboard</a>
+                <a href="buat-konsultasi.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm"><span class="mr-3">➕</span> Buat Konsultasi</a>
+                <a href="riwayat.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-blue-500"><span class="mr-3">📂</span> Riwayat Konsultasi</a>
             </nav>
 
             <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50">
-                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700 flex items-center justify-center">
-                    <img src="../pages/zoga.jpg" 
-                         alt="Ananda Zoga" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                         class="w-full h-full object-cover rounded-full">
-                    <div class="hidden w-full h-full items-center justify-center text-xs font-bold text-white">AZ</div>
+                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden">
+                    <img src="../pages/zoga.jpg" alt="Zoga" onerror="this.src='https://ui-avatars.com/api/?name=Zoga'" class="w-full h-full object-cover">
                 </div>
-                <div class="text-center">
-                    <p class="text-[9px] text-blue-400 uppercase font-black tracking-tighter mb-1">Pengembang</p>
-                    <p class="text-[11px] font-bold text-gray-100 leading-tight uppercase text-center">Ananda Zoga Syahputra, S.Tr.I.P.</p>
-                </div>
-                <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition active:scale-95">
-                    Keluar Sistem
-                </button>
+                <p class="text-[11px] font-bold text-gray-100 uppercase">Ananda Zoga Syahputra, S.Tr.I.P.</p>
+                <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition">Keluar Sistem</button>
             </div>
         </aside>
 
         <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
         <main class="flex-1 flex flex-col overflow-y-auto">
-            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-6 h-20 flex-shrink-0 sticky top-0 z-30">
-                <div class="flex items-center flex-1">
-                    <button onclick="toggleSidebar()" class="md:hidden mr-4 p-2 bg-gray-100 rounded-lg text-gray-600">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-8 h-20 flex-shrink-0 sticky top-0 z-30">
+                <div class="flex items-center">
+                    <button onclick="toggleSidebar()" class="md:hidden mr-4 p-2 bg-gray-100 rounded-lg">
+                        <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
-                    <div class="relative w-full max-w-md hidden md:block">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-xs">🔍</span>
-                        <input type="text" id="searchInput" onkeyup="filterRiwayat()" placeholder="Cari Instansi atau Judul Konsultasi..." class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl bg-gray-50 text-[11px] placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition shadow-sm font-medium">
-                    </div>
-                    <h2 class="md:hidden text-sm font-bold text-gray-800 uppercase tracking-wide">Riwayat</h2>
+                    <h2 class="text-sm md:text-lg font-black text-gray-800 uppercase tracking-widest">Riwayat Konsultasi</h2>
                 </div>
                 
                 <div class="flex items-center space-x-3">
-                    <button onclick="refreshData()" class="flex items-center space-x-2 bg-gray-50 hover:bg-gray-100 text-gray-600 px-3 py-2 rounded-xl border border-gray-200 transition active:scale-95 shadow-sm">
+                    <button onclick="refreshData()" class="flex items-center space-x-2 bg-gray-50 hover:bg-gray-100 text-gray-600 px-4 py-2 rounded-xl border border-gray-200 transition active:scale-95 shadow-sm">
                         <span id="refresh-icon">🔄</span>
-                        <span class="hidden md:inline text-[10px] font-bold uppercase tracking-widest">Update</span>
+                        <span class="hidden md:inline text-[10px] font-bold uppercase tracking-widest font-black">Refresh Data</span>
                     </button>
-                    <span id="display-user" class="hidden md:block text-[10px] font-bold text-gray-400 uppercase tracking-wider">User</span>
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center border text-xl shadow-inner">👤</div>
                 </div>
             </header>
 
-            <div class="p-4 md:p-8">
-                <div class="mb-4 md:hidden px-2">
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-xs">🔍</span>
-                        <input type="text" id="searchInputMobile" onkeyup="filterRiwayatMobile()" placeholder="Cari Instansi atau Judul..." class="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-[11px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+            <div class="p-6 md:p-10">
+                <div class="mb-6 max-w-2xl">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Pencarian Data</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">🔍</span>
+                        <input type="text" id="searchInput" onkeyup="filterRiwayat()" placeholder="Ketik Nama OPD atau Judul Masalah..." class="block w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-2xl bg-white text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm group-hover:border-gray-300">
                     </div>
                 </div>
 
@@ -201,7 +135,6 @@
         })();
 
         document.addEventListener('contextmenu', e => e.preventDefault());
-        document.getElementById('display-user').innerText = sessionStorage.getItem('userName') || 'User';
 
         const API_URL = "https://script.google.com/macros/s/AKfycbxI7CDn0iJ48mX2NcNosdCAH-P1LZESQN76wKgTrqgcly-BvYxwaQbaAj65bEyidfqZ/exec";
 
@@ -213,16 +146,8 @@
         async function refreshData() {
             const icon = document.getElementById('refresh-icon');
             icon.classList.add('spin');
-            
-            const listTable = document.getElementById('listTable');
-            listTable.classList.add('opacity-50');
-            
             await loadData();
-            
-            setTimeout(() => {
-                icon.classList.remove('spin');
-                listTable.classList.remove('opacity-50');
-            }, 800);
+            setTimeout(() => icon.classList.remove('spin'), 800);
         }
 
         async function loadData() {
@@ -258,6 +183,7 @@
                        </div>`
                     : `<div class="mt-2"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[8px] font-black uppercase border border-blue-200">Online</span></div>`;
 
+                // Preview Logics (Lampiran & TL)
                 let previewTL = "";
                 const regexLink = /Link Dokumen: (https?:\/\/[^\s]+)/;
                 const match = item.bukti_tl ? item.bukti_tl.match(regexLink) : null;
@@ -272,8 +198,7 @@
                     previewAjuan = `<div class="preview-container"><iframe src="${previewAjuanUrl}" class="preview-iframe"></iframe></div>`;
                 }
 
-                let timelineContent = "";
-                timelineContent += `
+                let timelineContent = `
                     <div class="timeline-step timeline-success">
                         <p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 1: Pengajuan & Tanggapan</p>
                         <div class="text-xs text-gray-700 mt-1">
@@ -297,10 +222,8 @@
                     timelineContent += `<div class="timeline-step ${tlClass}"><p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 2: Monitoring Tindak Lanjut</p><div class="text-xs text-gray-700 mt-1">${tlStatusText}</div></div>`;
                 }
 
-                let actionBtn = "";
-                if (isTerjawab && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")) {
-                    actionBtn = `<button onclick="formTL(${item.id})" class="mt-2 w-full py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition shadow-sm animate__animated animate__pulse animate__infinite">Kirim Laporan & Bukti TL</button>`;
-                }
+                let actionBtn = (isTerjawab && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")) 
+                    ? `<button onclick="formTL(${item.id})" class="mt-2 w-full py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition shadow-sm animate__animated animate__pulse animate__infinite">Kirim Laporan & Bukti TL</button>` : "";
 
                 return `<tr class="hover:bg-gray-50/50 transition border-b border-gray-50">
                     <td class="p-5 text-[9px] text-gray-400 align-top pt-6 col-waktu">${item.waktu}</td>
@@ -309,9 +232,8 @@
                         <div class="text-sm font-bold text-gray-800">${item.judul}</div>
                         <div class="text-[10px] text-blue-500 font-semibold italic mb-4 uppercase">${item.kategori}</div>
                         <div class="mb-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">${timelineContent}</div>
-                        <div class="flex space-x-2 mb-3">
+                        <div class="flex space-x-2">
                             ${item.lampiran && item.lampiran !== '-' ? `<a href="${item.lampiran}" target="_blank" class="px-3 py-1.5 bg-gray-100 text-gray-600 border border-gray-200 rounded-lg text-[9px] font-bold uppercase tracking-wider">📂 Buka Lampiran</a>` : ''}
-                            ${isPending ? `<button onclick="batalkanKonsultasi('${item.id}')" class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-[9px] font-bold uppercase tracking-wider">❌ Batalkan</button>` : ''}
                         </div>${actionBtn}
                     </td>
                     <td class="p-5 text-center align-top pt-6">
@@ -332,68 +254,33 @@
             renderRiwayat(filtered);
         }
 
-        function filterRiwayatMobile() {
-            const query = document.getElementById('searchInputMobile').value.toLowerCase();
-            const filtered = rawRiwayat.filter(item => 
-                item.opd.toLowerCase().includes(query) || 
-                item.judul.toLowerCase().includes(query)
-            );
-            renderRiwayat(filtered);
-        }
-
         async function formTL(rowId) {
             const { value: formValues } = await Swal.fire({
                 title: 'Laporan Tindak Lanjut',
-                html:
-                    '<div class="text-left">' +
-                    '<label class="text-[10px] font-bold text-gray-400 uppercase">Penjelasan Tindakan</label>' +
-                    '<textarea id="swal-input-ket" class="w-full p-2 border border-gray-300 rounded-lg text-xs mb-3 focus:ring-2 focus:ring-blue-500 outline-none" rows="3" placeholder="Jelaskan langkah-langkah yang telah diambil..."></textarea>' +
-                    '<label class="text-[10px] font-bold text-gray-400 uppercase">Dokumen Bukti (Opsional)</label>' +
-                    '<input type="file" id="swal-input-file" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" accept=".pdf,image/*,.doc,.docx,.xls,.xlsx">' +
-                    '</div>',
-                focusConfirm: false,
+                html: '<div class="text-left"><label class="text-[10px] font-bold text-gray-400 uppercase">Penjelasan</label><textarea id="swal-input-ket" class="w-full p-2 border rounded-lg text-xs mb-3 outline-none" rows="3"></textarea><input type="file" id="swal-input-file" class="w-full text-xs" accept=".pdf,image/*"></div>',
                 showCancelButton: true,
-                confirmButtonText: 'Kirim Laporan',
-                confirmButtonColor: '#2563eb',
-                customClass: { popup: 'rounded-3xl' },
                 preConfirm: () => {
                     const penjelasan = document.getElementById('swal-input-ket').value;
-                    const fileInput = document.getElementById('swal-input-file');
-                    if (!penjelasan.trim()) { Swal.showValidationMessage('Penjelasan tindakan wajib diisi!'); return false; }
-                    return { penjelasan: penjelasan, file: fileInput.files[0] || null };
+                    if (!penjelasan.trim()) { Swal.showValidationMessage('Wajib diisi!'); return false; }
+                    return { penjelasan: penjelasan, file: document.getElementById('swal-input-file').files[0] || null };
                 }
             });
-
             if (formValues) {
-                Swal.fire({ title: 'Mengirim Laporan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                Swal.fire({ title: 'Mengirim...', didOpen: () => Swal.showLoading() });
                 if (formValues.file) {
                     const reader = new FileReader();
-                    reader.onload = async (e) => {
-                        const fileData = e.target.result.split(',')[1];
-                        await kirimDataTL(rowId, formValues.penjelasan, fileData, formValues.file.name, formValues.file.type);
-                    };
+                    reader.onload = async (e) => await kirimDataTL(rowId, formValues.penjelasan, e.target.result.split(',')[1], formValues.file.name, formValues.file.type);
                     reader.readAsDataURL(formValues.file);
-                } else { await kirimDataTL(rowId, formValues.penjelasan, "", "", ""); }
+                } else await kirimDataTL(rowId, formValues.penjelasan, "", "", "");
             }
         }
 
         async function kirimDataTL(rowId, penjelasan, fileData, fileName, fileType) {
             try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: "kirim_tindak_lanjut", row: rowId, penjelasan: penjelasan, fileData: fileData, fileName: fileName, fileType: fileType })
-                });
-                Swal.fire({ icon: 'success', title: 'Terkirim!', timer: 2000, showConfirmButton: false });
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "kirim_tindak_lanjut", row: rowId, penjelasan: penjelasan, fileData: fileData, fileName: fileName, fileType: fileType }) });
+                Swal.fire({ icon: 'success', title: 'Terkirim!', timer: 1500 });
                 refreshData();
-            } catch (e) { Swal.fire('Gagal', 'Terjadi kesalahan sistem.', 'error'); }
-        }
-
-        function batalkanKonsultasi(id) {
-            Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "hapus_konsultasi", id: id }) }).then(() => refreshData());
-                }
-            });
+            } catch (e) { Swal.fire('Gagal', 'Sistem error.', 'error'); }
         }
 
         window.onload = loadData;
