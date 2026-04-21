@@ -21,6 +21,7 @@
             padding: 2px;
             background: linear-gradient(to bottom right, #3b82f6, #1e40af);
         }
+        .stat-card { @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-md; }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 overflow-hidden">
@@ -84,29 +85,35 @@
                 </div>
             </header>
 
-            <div class="p-6 md:p-8 max-w-6xl mx-auto w-full">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
-                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4 text-2xl">📋</div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Total Konsultasi</p>
-                        <h3 id="stat-total" class="text-4xl font-black text-gray-800 animate-pulse text-center">...</h3>
+            <div class="p-6 md:p-8 max-w-7xl mx-auto w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 text-2xl">📋</div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Masuk</p>
+                        <h3 id="stat-total" class="text-3xl font-black text-gray-800 animate-pulse">...</h3>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
-                        <div class="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-full flex items-center justify-center mb-4 text-2xl">⏳</div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Dalam Proses</p>
-                        <h3 id="stat-pending" class="text-4xl font-black text-yellow-600 animate-pulse text-center">...</h3>
+                    <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
+                        <div class="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-xl flex items-center justify-center mb-4 text-2xl">⏳</div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Butuh Jawaban</p>
+                        <h3 id="stat-pending" class="text-3xl font-black text-yellow-600 animate-pulse">...</h3>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
-                        <div class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-4 text-2xl">✅</div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Telah Selesai</p>
-                        <h3 id="stat-done" class="text-4xl font-black text-green-600 animate-pulse text-center">...</h3>
+                    <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-orange-100 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center mb-4 text-2xl">🚩</div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Verifikasi TL</p>
+                        <h3 id="stat-verif" class="text-3xl font-black text-orange-600 animate-pulse">...</h3>
+                        <div id="ping-tl" class="hidden absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
+                    </div>
+                    <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-teal-100 flex flex-col items-center justify-center text-center">
+                        <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center mb-4 text-2xl">🏆</div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Tuntas TL</p>
+                        <h3 id="stat-done" class="text-3xl font-black text-teal-600 animate-pulse">...</h3>
                     </div>
                 </div>
 
                 <div class="bg-gray-800 text-white p-8 rounded-3xl shadow-xl border border-gray-700">
                     <h3 class="text-xl font-bold italic mb-2 text-blue-400 uppercase tracking-tighter">Selamat Datang di Portal SiCODI</h3>
                     <p class="text-gray-400 text-sm leading-relaxed mb-6">
-                        Sistem Konsultasi Digital ini dirancang untuk mempermudah koordinasi pembinaan dan pengawasan di Lingkungan Pemerintah Kabupaten Malang. Kini mendukung metode **Hybrid (Online & Tatap Muka)**.
+                        Sistem Konsultasi Digital ini dirancang untuk mempermudah koordinasi pembinaan dan pengawasan di Lingkungan Pemerintah Kabupaten Malang. Kini mendukung fitur **Monitoring Tindak Lanjut** untuk memastikan setiap arahan dijalankan dengan tuntas.
                     </p>
                     <div class="flex flex-wrap gap-3">
                         <div class="inline-flex items-center px-4 py-2 bg-gray-700/50 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-300 border border-gray-600">
@@ -114,7 +121,7 @@
                             Sistem: <span class="ml-1 text-green-400">Aktif</span>
                         </div>
                         <div class="inline-flex items-center px-4 py-2 bg-blue-900/30 rounded-full text-[10px] font-bold uppercase tracking-widest text-blue-300 border border-blue-800/50">
-                            🏢 Mode: <span class="ml-1 text-blue-400">Hybrid Enabled</span>
+                            🏢 Monitoring: <span class="ml-1 text-blue-400">Closed-Loop Enabled</span>
                         </div>
                     </div>
                 </div>
@@ -132,12 +139,6 @@
         })();
 
         document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = function(e) {
-            if (e.keyCode == 123) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
-        };
-
         document.getElementById('display-user').innerText = sessionStorage.getItem('userName') || 'User';
 
         function toggleSidebar() {
@@ -148,22 +149,8 @@
         }
 
         function logout() {
-            Swal.fire({
-                title: 'Keluar Sistem?',
-                text: "Anda akan kembali ke halaman login.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#1F2937',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Keluar!',
-                cancelButtonText: 'Batal',
-                customClass: { popup: 'rounded-3xl' }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    sessionStorage.clear();
-                    window.location.href = 'login.html';
-                }
-            })
+            sessionStorage.clear();
+            window.location.href = 'login.html';
         }
 
         const API_URL = "https://script.google.com/macros/s/AKfycbzACBKApDa1eooecW61hN0BNG-tcrUifNTk8Qa5R42eYWbpbcxqZhxbYwmZVxFAuexi/exec";
@@ -172,16 +159,27 @@
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
+                
+                // Menghitung statistik berdasarkan siklus TL
                 const total = data.length;
-                const pending = data.filter(item => item.status === 'Menunggu' || item.status === '-' || item.status === '').length;
-                const done = data.filter(item => item.status === 'Selesai').length;
+                const pending = data.filter(item => item.status === 'Menunggu').length;
+                const verifTl = data.filter(item => item.status_tl === 'Menunggu Verifikasi').length;
+                const tuntas = data.filter(item => item.status_tl === 'Tuntas').length;
 
+                // Update Elemen HTML
                 document.getElementById('stat-total').innerText = total;
-                document.getElementById('stat-total').classList.remove('animate-pulse');
                 document.getElementById('stat-pending').innerText = pending;
-                document.getElementById('stat-pending').classList.remove('animate-pulse');
-                document.getElementById('stat-done').innerText = done;
-                document.getElementById('stat-done').classList.remove('animate-pulse');
+                document.getElementById('stat-verif').innerText = verifTl;
+                document.getElementById('stat-done').innerText = tuntas;
+
+                // Indikator Notifikasi TL
+                if(verifTl > 0) document.getElementById('ping-tl').classList.remove('hidden');
+
+                // Hilangkan animasi pulse
+                ['stat-total', 'stat-pending', 'stat-verif', 'stat-done'].forEach(id => {
+                    document.getElementById(id).classList.remove('animate-pulse');
+                });
+                
             } catch (error) {
                 console.error("Gagal mengambil data statistik:", error);
             }
