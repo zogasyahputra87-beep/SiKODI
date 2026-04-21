@@ -167,8 +167,10 @@
                     const status = item.status || "Menunggu";
                     const lampiran = item.lampiran || "";
                     
-                    // INDIKATOR METODE (Pembaruan)
-                    const metodeTag = item.metode === 'Offline' 
+                    // PERBAIKAN DISINI: Normalisasi teks metode (Case Insensitive & Trim Spasi)
+                    const metodeDb = item.metode ? item.metode.toString().trim().toLowerCase() : "online";
+                    
+                    const metodeTag = metodeDb === 'offline' 
                         ? `<div class="mt-2 flex flex-col space-y-1">
                              <span class="inline-block px-2 py-0.5 bg-purple-100 text-purple-700 text-[9px] font-black rounded border border-purple-200 uppercase tracking-tighter">Offline / Tatap Muka</span>
                              <span class="text-[9px] text-purple-600 font-bold italic">📅 Ajuan: ${item.tgl_offline}</span>
