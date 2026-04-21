@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buat Konsultasi | E-Consulting</title>
+    <title>Buat Konsultasi | SiCODI</title>
     
     <link rel="icon" type="image/png" href="../pages/logo_kab.png">
     
@@ -17,7 +17,6 @@
             -webkit-user-select: none;
             display: none; 
         }
-        /* Bingkai halus untuk foto profil pengembang */
         .profile-ring {
             padding: 2px;
             background: linear-gradient(to bottom right, #3b82f6, #1e40af);
@@ -28,7 +27,6 @@
 
     <div class="flex h-screen overflow-hidden relative">
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1F2937] text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
-            
             <div class="p-6 border-b border-gray-700 flex flex-col items-center">
                 <img src="../pages/logo_kab.png" alt="Logo Kab Malang" class="w-14 mb-3 drop-shadow-md">
                 <div class="text-center">
@@ -96,7 +94,7 @@
                                     <option value="Pengelolaan Keuangan">Pengelolaan Keuangan</option>
                                     <option value="Administrasi Pemerintahan">Administrasi Pemerintahan</option>
                                     <option value="Pengadaan Barang/Jasa">Pengadaan Barang/Jasa</option>
-                                    <option value="Pengadaan Barang/Jasa">Pelaksanaan Program/Kegiatan</option>
+                                    <option value="Pelaksanaan Program/Kegiatan">Pelaksanaan Program/Kegiatan</option>
                                     <option value="Lainnya">Lainnya</option>
                                 </select>
                             </div>
@@ -105,6 +103,20 @@
                         <div id="otherTypeContainer" class="hidden">
                             <label class="block text-[11px] font-bold text-blue-600 uppercase mb-2 italic">Sebutkan Kategori Lainnya</label>
                             <input type="text" id="otherConsultType" class="w-full p-3 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-400 shadow-sm">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Metode Konsultasi</label>
+                                <select id="metode" onchange="toggleTanggal()" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" required>
+                                    <option value="Online">Online (Chat/WhatsApp)</option>
+                                    <option value="Offline">Offline (Tatap Muka)</option>
+                                </select>
+                            </div>
+                            <div id="wrap-tanggal" class="hidden">
+                                <label class="block text-[11px] font-bold text-blue-600 uppercase mb-2">Rencana Tanggal Pertemuan</label>
+                                <input type="date" id="tgl_offline" class="w-full p-3 bg-blue-50 border border-blue-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-400 transition">
+                            </div>
                         </div>
 
                         <div>
@@ -144,7 +156,6 @@
     </div>
 
     <script>
-        // Logika script tetap sama seperti kodemu
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'login.html';
@@ -186,10 +197,19 @@
             })
         }
 
+        // FUNGSI TOGGLE INPUT BARU
         function toggleOtherInput() {
             const selectVal = document.getElementById('consultType').value;
             const container = document.getElementById('otherTypeContainer');
             container.classList.toggle('hidden', selectVal !== 'Lainnya');
+        }
+
+        function toggleTanggal() {
+            const metode = document.getElementById('metode').value;
+            const wrap = document.getElementById('wrap-tanggal');
+            wrap.classList.toggle('hidden', metode !== 'Offline');
+            if(metode === 'Offline') document.getElementById('tgl_offline').required = true;
+            else document.getElementById('tgl_offline').required = false;
         }
 
         document.getElementById('consultForm').addEventListener('submit', function(e) {
@@ -235,6 +255,10 @@
                 action: "tambah_konsultasi",
                 opd: document.getElementById('opdName').value,
                 kategori: (document.getElementById('consultType').value === 'Lainnya') ? document.getElementById('otherConsultType').value : document.getElementById('consultType').value,
+                // DATA BARU DISINI
+                metode: document.getElementById('metode').value,
+                tgl_offline: document.getElementById('tgl_offline').value || "-",
+                
                 judul: document.getElementById('subject').value,
                 issue: document.getElementById('issue').value,
                 whatsapp: document.getElementById('whatsapp').value,
