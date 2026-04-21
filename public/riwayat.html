@@ -38,6 +38,7 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
+        /* Bingkai halus untuk foto profil pengembang */
         .profile-ring {
             padding: 2px;
             background: linear-gradient(to bottom right, #3b82f6, #1e40af);
@@ -117,7 +118,7 @@
                             <thead class="bg-gray-50 border-b border-gray-100">
                                 <tr class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">
                                     <th class="p-5 col-waktu">Waktu</th>
-                                    <th class="p-5 w-48">Instansi</th>
+                                    <th class="p-5 w-48">Instansi / Metode</th>
                                     <th class="p-5">Detail Konsultasi & Jawaban</th>
                                     <th class="p-5 text-center w-32">Status</th>
                                 </tr>
@@ -147,6 +148,7 @@
             if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
         };
 
+        // Pastikan API_URL ini adalah deployment terbaru setelah update Apps Script
         const API_URL = "https://script.google.com/macros/s/AKfycbwdD8QBytVX9xdI_RYRhkMteQl7pYWF0XFNEtHVQR-tx5KkQ6Xl2VJuIbv4q1uHI-Ig/exec";
 
         function toggleSidebar() {
@@ -196,17 +198,22 @@
                 listTable.innerHTML = data.reverse().map(item => {
                     const isPending = item.status !== 'Selesai';
                     
-                    // Indikator Metode Konsultasi (Baru)
+                    // INDIKATOR METODE & TANGGAL (Pembaruan)
                     const metodeBadge = item.metode === 'Offline' 
-                        ? `<span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[8px] font-bold uppercase border border-purple-200">Offline ${item.tgl_offline !== '-' ? `(${item.tgl_offline})` : ''}</span>`
-                        : `<span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[8px] font-bold uppercase border border-blue-200">Online</span>`;
+                        ? `<div class="mt-2 inline-flex flex-col space-y-1">
+                             <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[8px] font-black uppercase border border-purple-200">Offline / Tatap Muka</span>
+                             <span class="text-[9px] text-purple-600 font-bold italic">📅 Ajuan: ${item.tgl_offline || '-'}</span>
+                           </div>`
+                        : `<div class="mt-2">
+                             <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[8px] font-black uppercase border border-blue-200">Online / Digital</span>
+                           </div>`;
 
                     return `
                     <tr class="hover:bg-gray-50/50 transition border-b border-gray-50">
                         <td class="p-5 text-[9px] text-gray-400 align-top pt-6 col-waktu">${item.waktu}</td>
                         <td class="p-5 font-bold text-sm text-gray-700 align-top pt-6">
                             ${item.opd}
-                            <div class="mt-2">${metodeBadge}</div>
+                            ${metodeBadge}
                         </td>
                         <td class="p-5 align-top pt-6">
                             <div class="text-sm font-bold text-gray-800">${item.judul}</div>
