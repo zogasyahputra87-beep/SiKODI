@@ -261,6 +261,11 @@
                 email: document.getElementById('email').value,
                 lampiran: gDriveLink,
                 username: sessionStorage.getItem('userName'),
+                
+                // --- PENYESUAIAN WILAYAH ---
+                // Mengambil nilai wilayah dari session agar admin irban bisa memfilter
+                wilayah_opd: sessionStorage.getItem('wilayah'),
+                
                 status_tl: "Belum TL"
             };
 
