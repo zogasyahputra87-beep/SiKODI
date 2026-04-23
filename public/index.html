@@ -1,19 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta name="google-site-verification" content="PThX0k0-0mpfE8h8zCusaP9iocfEovlLdAcA1qYBJ80" />
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Dashboard | SiCODI Inspektorat Kabupaten Malang</title>
     <meta name="description" content="Monitoring real-time progres konsultasi digital dan tindak lanjut closed-loop Inspektorat Daerah Kabupaten Malang.">
-    <meta name="keywords" content="Dashboard SiCODI, Inspektorat Malang, Monitoring Konsultasi, Kabupaten Malang">
-    
-    <meta property="og:title" content="Dashboard SiCODI - Inspektorat Kabupaten Malang">
-    <meta property="og:description" content="Ringkasan statistik dan progres konsultasi digital secara real-time.">
-    <meta property="og:image" content="https://sicodi-malang.vercel.app/pages/logo_kab.png">
-    <meta property="og:type" content="website">
 
     <link rel="icon" type="image/png" href="../pages/logo_kab.png">
     <link rel="manifest" href="manifest.json">
@@ -23,40 +15,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        body {
-            user-select: none;
-            -webkit-user-select: none;
-            display: none; 
-        }
-        /* Bingkai gradasi untuk foto profil */
-        .profile-ring {
-            padding: 2px;
-            background: linear-gradient(to bottom right, #3b82f6, #1e40af);
-        }
+        body { user-select: none; -webkit-user-select: none; display: none; }
+        .profile-ring { padding: 2px; background: linear-gradient(to bottom right, #3b82f6, #1e40af); }
         .stat-card { @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-md bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center; }
-        
-        /* Animasi putar untuk tombol refresh */
         .spin { animation: rotate 0.8s linear; }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 overflow-hidden">
 
     <div class="flex h-screen overflow-hidden relative">
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1F2937] text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
-            
             <div class="p-6 border-b border-gray-700 flex flex-col items-center">
-                <img src="../pages/logo_kab.png" alt="Logo Kab Malang" class="w-14 mb-3 drop-shadow-md">
+                <img src="../pages/logo_kab.png" alt="Logo" class="w-14 mb-3 drop-shadow-md">
                 <div class="text-center">
                     <h1 class="text-xl font-bold text-white tracking-tight">SiCODI</h1>
                     <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight text-center">Inspektorat Daerah<br>Kabupaten Malang</p>
                 </div>
-                <button onclick="toggleSidebar()" class="md:hidden absolute top-4 right-4 text-gray-400">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
             </div>
             
             <nav class="flex-1 mt-6 px-4 space-y-1">
@@ -69,27 +44,27 @@
                 <a href="riwayat.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">
                     <span class="mr-3">📂</span> Riwayat Konsultasi
                 </a>
+                <div id="admin-link" class="hidden">
+                    <hr class="my-4 border-gray-700">
+                    <a href="admin.html" class="w-full flex items-center p-3 rounded-lg hover:bg-red-900/30 text-red-400 transition text-[10px] font-bold uppercase tracking-widest">
+                        <span class="mr-3">🛡️</span> Admin Panel
+                    </a>
+                </div>
             </nav>
 
             <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50">
-                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700 flex items-center justify-center">
-                    <img src="../pages/zoga.jpg" 
-                         alt="Ananda Zoga" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                         class="w-full h-full object-cover rounded-full">
-                    <div class="hidden w-full h-full items-center justify-center text-xs font-bold text-white">AZ</div>
+                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden">
+                    <img src="../pages/zoga.jpg" alt="Zoga" onerror="this.src='https://ui-avatars.com/api/?name=Ananda+Zoga'" class="w-full h-full object-cover">
                 </div>
                 <div class="text-center">
                     <p class="text-[9px] text-blue-400 uppercase font-black tracking-tighter mb-1">Pengembang</p>
-                    <p class="text-[11px] font-bold text-gray-100 leading-tight uppercase text-center">Ananda Zoga Syahputra, S.Tr.I.P.</p>
+                    <p class="text-[11px] font-bold text-gray-100 uppercase text-center">Ananda Zoga Syahputra, S.Tr.I.P.</p>
                 </div>
-                <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition active:scale-95">
-                    Keluar Sistem
-                </button>
+                <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition active:scale-95">Keluar Sistem</button>
             </div>
         </aside>
 
-        <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+        <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
         
         <main class="flex-1 flex flex-col overflow-y-auto">
              <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-6 h-20 flex-shrink-0">
@@ -141,17 +116,14 @@
                 </div>
 
                 <div class="bg-gray-800 text-white p-8 rounded-3xl shadow-xl border border-gray-700">
-                    <h3 class="text-xl font-bold italic mb-2 text-blue-400 uppercase tracking-tighter">Selamat Datang di Portal SiCODI</h3>
+                    <h3 class="text-xl font-bold italic mb-2 text-blue-400 uppercase tracking-tighter">Portal SiCODI Kabupaten Malang</h3>
                     <p class="text-gray-400 text-sm leading-relaxed mb-6">
-                        Sistem Konsultasi Digital ini dirancang untuk mempermudah koordinasi pembinaan dan pengawasan di Lingkungan Pemerintah Kabupaten Malang. Kini mendukung fitur **Monitoring Tindak Lanjut** untuk memastikan setiap arahan dijalankan dengan tuntas.
+                        Sistem Konsultasi Digital dengan basis data **Supabase Real-time**. Memastikan transparansi pengawasan dan percepatan tindak lanjut di lingkungan Pemerintah Kabupaten Malang.
                     </p>
                     <div class="flex flex-wrap gap-3">
                         <div class="inline-flex items-center px-4 py-2 bg-gray-700/50 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-300 border border-gray-600">
                             <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-ping"></span>
-                            Sistem: <span class="ml-1 text-green-400">Aktif</span>
-                        </div>
-                        <div class="inline-flex items-center px-4 py-2 bg-blue-900/30 rounded-full text-[10px] font-bold uppercase tracking-widest text-blue-300 border border-blue-800/50">
-                            🏢 Monitoring: <span class="ml-1 text-blue-400">Closed-Loop Enabled</span>
+                            Database: <span class="ml-1 text-green-400">Connected</span>
                         </div>
                     </div>
                 </div>
@@ -160,11 +132,22 @@
     </div>
 
     <script>
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = "https://ID_PROYEK_KAMU.supabase.co"; 
+        const SUPABASE_KEY = "API_KEY_ANON_KAMU";
+        const headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+        };
+
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'login.html';
             } else {
                 document.body.style.display = "block";
+                if(sessionStorage.getItem('userRole') === 'admin'){
+                    document.getElementById('admin-link').classList.remove('hidden');
+                }
             }
         })();
 
@@ -172,18 +155,14 @@
         document.getElementById('display-user').innerText = sessionStorage.getItem('userName') || 'User';
 
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('overlay').classList.toggle('hidden');
         }
 
         function logout() {
             sessionStorage.clear();
             window.location.href = 'login.html';
         }
-
-        const API_URL = "https://script.google.com/macros/s/AKfycbxI7CDn0iJ48mX2NcNosdCAH-P1LZESQN76wKgTrqgcly-BvYxwaQbaAj65bEyidfqZ/exec";
 
         async function manualRefresh() {
             const icon = document.getElementById('icon-refresh');
@@ -195,20 +174,26 @@
             });
 
             await updateStats();
-            
-            setTimeout(() => {
-                icon.classList.remove('spin');
-            }, 800);
+            setTimeout(() => icon.classList.remove('spin'), 800);
         }
 
         async function updateStats() {
+            const currentUser = sessionStorage.getItem('userName');
+            const currentRole = sessionStorage.getItem('userRole');
+
+            // Bangun URL Query (Jika bukan admin, filter berdasarkan username pengaju)
+            let queryUrl = `${SUPABASE_URL}/rest/v1/konsultasi?select=*`;
+            if (currentRole !== 'admin') {
+                queryUrl += `&username=eq.${currentUser}`;
+            }
+
             try {
-                const response = await fetch(API_URL);
+                const response = await fetch(queryUrl, { headers: headers });
                 const data = await response.json();
                 
                 const total = data.length;
-                const pending = data.filter(item => item.status === 'Menunggu').length;
-                const prosesTl = data.filter(item => item.status === 'Terjawab' && item.status_tl === 'Belum TL').length;
+                const pending = data.filter(item => !item.jawaban || item.jawaban === "").length;
+                const prosesTl = data.filter(item => (item.jawaban && item.jawaban !== "") && item.status_tl === 'Belum TL').length;
                 const verifTl = data.filter(item => item.status_tl === 'Menunggu Verifikasi').length;
                 const tuntas = data.filter(item => item.status_tl === 'Tuntas').length;
 
@@ -218,18 +203,16 @@
                 document.getElementById('stat-verif').innerText = verifTl;
                 document.getElementById('stat-done').innerText = tuntas;
 
-                if(verifTl > 0) {
-                    document.getElementById('ping-tl').classList.remove('hidden');
-                } else {
-                    document.getElementById('ping-tl').classList.add('hidden');
-                }
+                // Tampilkan notifikasi merah jika ada yang butuh verifikasi
+                if(verifTl > 0) document.getElementById('ping-tl').classList.remove('hidden');
+                else document.getElementById('ping-tl').classList.add('hidden');
 
                 ['stat-total', 'stat-pending', 'stat-proses-tl', 'stat-verif', 'stat-done'].forEach(id => {
                     document.getElementById(id).classList.remove('animate-pulse');
                 });
                 
             } catch (error) {
-                console.error("Error:", error);
+                console.error("Gagal update statistik:", error);
             }
         }
 
