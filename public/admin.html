@@ -116,26 +116,25 @@
     <script>
         const SUPABASE_URL = "https://afaiwyfodjllolzwbhmz.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_0Jj5RTBAL3gewJvwOsvAxA_aPu370Bl"; 
+        
         const headers = {
             "apikey": SUPABASE_KEY,
             "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "return=minimal"
+            "Content-Type": "application/json"
         };
 
         let rawData = [];
 
-        // --- PROTEKSI & SETUP ---
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true' || sessionStorage.getItem('userRole') !== 'admin') {
                 window.location.href = 'login.html';
             } else { 
                 document.body.style.display = "block";
-                const wilayah = sessionStorage.getItem('wilayah');
+                const wilayah = (sessionStorage.getItem('wilayah') || 'semua').trim();
                 const nama = sessionStorage.getItem('namaOpd');
-                document.getElementById('admin-wilayah-label').innerText = wilayah === 'semua' ? 'Super Admin' : wilayah;
+                document.getElementById('admin-wilayah-label').innerText = wilayah.toLowerCase() === 'semua' ? 'Super Admin' : wilayah;
                 document.getElementById('admin-name-display').innerText = nama;
-                document.getElementById('admin-role-display').innerText = wilayah === 'semua' ? 'Inspektur / Sekretaris' : 'Auditor Irban';
+                document.getElementById('admin-role-display').innerText = wilayah.toLowerCase() === 'semua' ? 'Inspektur / Sekretaris' : 'Auditor Irban';
             }
         })();
 
@@ -146,17 +145,20 @@
 
         async function fetchAdmin() {
             const loader = document.getElementById('loader');
-            const myWilayah = sessionStorage.getItem('wilayah');
+            // Pastikan perbandingan case-insensitive dan bersih dari spasi
+            const myWilayah = (sessionStorage.getItem('wilayah') || 'semua').trim().toLowerCase();
             loader.classList.remove('hidden');
 
-            // --- FILTER OTOMATIS BERDASARKAN WILAYAH ---
             let queryUrl = `${SUPABASE_URL}/rest/v1/konsultasi?select=*&order=waktu_pengajuan.desc`;
-            if (myWilayah && myWilayah !== 'semua') {
-                queryUrl += `&wilayah_opd=eq.${myWilayah}`;
+            
+            // JIKA BUKAN SUPER ADMIN ('semua'), lakukan filter wilayah_opd
+            if (myWilayah !== 'semua') {
+                // Gunakan .ilike agar lebih fleksibel terhadap case sensitive di database
+                queryUrl += `&wilayah_opd=ilike.${myWilayah}`;
             }
 
             try {
-                const res = await fetch(queryUrl, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
+                const res = await fetch(queryUrl, { headers: headers });
                 rawData = await res.json();
                 loader.classList.add('hidden');
                 
@@ -188,7 +190,7 @@
                 const isTerjawab = item.jawaban && item.jawaban !== "";
                 const tglAju = new Date(item.waktu_pengajuan).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
                 
-                const statusTlBadge = item.status_tl === "Tuntas" ? "bg-teal-100 text-teal-700" : (isTerjawab ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700");
+                const statusTlBadge = item.status_tl === "Tuntas" ? "bg-teal-100 text-teal-700 border-teal-200" : (isTerjawab ? "bg-green-100 text-green-700 border-green-200" : "bg-yellow-100 text-yellow-700 border-yellow-200");
                 const statusTlText = item.status_tl === "Tuntas" ? "Tuntas" : (isTerjawab ? "Terjawab" : "Menunggu");
 
                 return `<tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
@@ -239,7 +241,8 @@
                         headers: { 
                             "apikey": SUPABASE_KEY, 
                             "Authorization": `Bearer ${SUPABASE_KEY}`,
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Prefer": "return=minimal"
                         },
                         body: JSON.stringify({ 
                             jawaban: reply, 
