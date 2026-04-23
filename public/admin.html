@@ -92,7 +92,6 @@
     </div>
 
     <script>
-        // --- KONFIGURASI SUPABASE ---
         const SUPABASE_URL = "https://afaiwyfodjllolzwbhmz.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_0Jj5RTBAL3gewJvwOsvAxA_aPu370Bl"; 
         const headers = {
@@ -144,16 +143,22 @@
                     ? `<div class="mt-2"><span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[9px] font-black uppercase border border-purple-200">Offline</span><br><span class="text-[9px] text-purple-600 italic">📅 ${item.tanggal_offline}</span></div>`
                     : `<div class="mt-2"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px] font-black uppercase border border-blue-200">Online</span></div>`;
 
-                let previewTL = (item.bukti_tl && item.bukti_tl.includes('drive.google.com')) 
-                    ? `<div class="preview-container"><iframe src="${item.bukti_tl.split('Link Dokumen: ')[1].replace('/view', '/preview')}" class="preview-iframe"></iframe></div>` : "";
+                // Handle link GDrive Bukti TL
+                let previewTL = "";
+                if (item.bukti_tl && item.bukti_tl.includes('drive.google.com')) {
+                    const parts = item.bukti_tl.split('Link Dokumen: ');
+                    const url = parts.length > 1 ? parts[1].trim() : item.bukti_tl;
+                    previewTL = `<div class="preview-container"><iframe src="${url.replace('/view', '/preview')}" class="preview-iframe"></iframe></div>`;
+                }
 
+                // Handle link GDrive Lampiran Ajuan
                 let previewAjuan = (item.lampiran && item.lampiran.includes('drive.google.com')) 
                     ? `<div class="preview-container"><iframe src="${item.lampiran.replace('/view', '/preview')}" class="preview-iframe"></iframe></div>` : "";
 
                 let timelineContent = `
                     <div class="timeline-step timeline-success">
                         <p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 1: Pengajuan OPD</p>
-                        <div class="text-xs text-gray-700 mt-1"><p class="italic mb-2">"${item.rincian_masalah}"</p>${previewAjuan}</div>
+                        <div class="text-xs text-gray-700 mt-1"><p class="italic mb-2">"${item.rincian_masalah || '-'}"</p>${previewAjuan}</div>
                     </div>
                     <div class="timeline-step ${isTerjawab ? 'timeline-success' : 'timeline-active'}">
                         <p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 2: Jawaban Auditor</p>
@@ -167,7 +172,7 @@
                     if(item.status_tl === "Menunggu Verifikasi") {
                         tlStatusText = `<span class="text-orange-600 font-bold">Bukti Masuk:</span> ${item.bukti_tl.split('|')[0]} ${previewTL}`;
                     } else if(item.status_tl === "Tuntas") {
-                        tlStatusText = `<span class="text-teal-600 font-bold">✅ Tuntas:</span> Selesai diverifikasi. <br><span class="text-[10px] text-gray-500">Catatan: ${item.catatan_admin_tl}</span> ${previewTL}`;
+                        tlStatusText = `<span class="text-teal-600 font-bold">✅ Tuntas:</span> Selesai diverifikasi. <br><span class="text-[10px] text-gray-500">Catatan: ${item.catatan_admin_tl || '-'}</span> ${previewTL}`;
                         tlClass = "timeline-success";
                     }
                     timelineContent += `<div class="timeline-step ${tlClass}"><p class="text-[9px] font-bold text-gray-400 uppercase">Tahap 3: Verifikasi TL</p><div class="text-xs text-gray-700 mt-1">${tlStatusText}</div></div>`;
@@ -177,8 +182,8 @@
                     <div class="mt-4 p-4 bg-orange-50 border rounded-xl">
                         <textarea id="catatan-tl-${id}" class="w-full p-3 text-xs border border-orange-200 rounded-lg outline-none mb-3" rows="2" placeholder="Tulis catatan verifikasi..."></textarea>
                         <div class="flex space-x-2">
-                            <button onclick="prosesVerifikasi(${id}, 'Tuntas')" class="flex-1 bg-teal-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase">Terima (Tuntas)</button>
-                            <button onclick="prosesVerifikasi(${id}, 'Perlu Perbaikan')" class="flex-1 bg-white text-red-600 border border-red-200 py-2 rounded-lg text-[10px] font-bold uppercase">Revisi</button>
+                            <button onclick="konfirmasiVerifikasi(${id}, 'Tuntas')" class="flex-1 bg-teal-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase">Terima (Tuntas)</button>
+                            <button onclick="konfirmasiVerifikasi(${id}, 'Perlu Perbaikan')" class="flex-1 bg-white text-red-600 border border-red-200 py-2 rounded-lg text-[10px] font-bold uppercase">Revisi</button>
                         </div>
                     </div>` : "";
 
@@ -198,7 +203,7 @@
                     </td>
                     <td class="p-5 text-center align-top pt-6 w-40">
                         <div class="flex flex-col space-y-2">
-                            ${!isTerjawab ? `<button onclick="kirimJawaban(${id})" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase">Kirim Jawaban</button>` : `<button onclick="batalSelesai(${id})" class="bg-orange-500 text-white py-2 rounded-lg text-[10px] font-bold uppercase">Ubah Jawaban</button>`}
+                            ${!isTerjawab ? `<button onclick="konfirmasiKirimJawaban(${id})" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase">Kirim Jawaban</button>` : `<button onclick="batalSelesai(${id})" class="bg-orange-500 text-white py-2 rounded-lg text-[10px] font-bold uppercase">Ubah Jawaban</button>`}
                             <a href="https://wa.me/${item.nomor_hp}" target="_blank" class="bg-white border border-gray-300 text-gray-600 py-2 rounded-lg text-[10px] font-bold uppercase">WhatsApp</a>
                         </div>
                     </td>
@@ -206,10 +211,28 @@
             }).join('');
         }
 
-        async function kirimJawaban(id) {
+        // --- FITUR KONFIRMASI JAWABAN ---
+        function konfirmasiKirimJawaban(id) {
             const reply = document.getElementById(`reply-${id}`).value;
             if(!reply.trim()) return Swal.fire('Error', 'Tulis jawaban dulu!', 'error');
-            
+
+            Swal.fire({
+                title: 'Kirim Jawaban?',
+                text: "Jawaban yang dikirim akan langsung tampil di dashboard OPD terkait.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Kirim Jawaban',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    kirimJawaban(id, reply);
+                }
+            });
+        }
+
+        async function kirimJawaban(id, reply) {
             Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, {
@@ -222,19 +245,37 @@
                     })
                 });
 
-                if(!res.ok) throw new Error("Gagal menyimpan ke database");
+                if(!res.ok) throw new Error("Gagal menyimpan");
 
                 Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Jawaban terkirim.', timer: 1500, showConfirmButton: false });
                 fetchAdmin(); 
             } catch (e) { 
-                Swal.fire('Gagal', 'Terjadi kesalahan saat menyimpan jawaban. Pastikan Policy UPDATE di Supabase sudah aktif.', 'error'); 
+                Swal.fire('Gagal', 'Pastikan Policy UPDATE di Supabase sudah aktif atau RLS sudah OFF.', 'error'); 
             }
         }
 
-        async function prosesVerifikasi(id, status) {
+        // --- FITUR KONFIRMASI VERIFIKASI ---
+        function konfirmasiVerifikasi(id, status) {
             const catatan = document.getElementById(`catatan-tl-${id}`).value;
-            if(!catatan.trim()) return Swal.fire('Error', 'Catatan wajib diisi!', 'error');
+            if(!catatan.trim()) return Swal.fire('Error', 'Catatan verifikasi wajib diisi!', 'error');
 
+            Swal.fire({
+                title: status === 'Tuntas' ? 'Terima Tindak Lanjut?' : 'Minta Perbaikan?',
+                text: `Status monitoring akan diubah menjadi: ${status}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: status === 'Tuntas' ? '#0d9488' : '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Proses',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    prosesVerifikasi(id, status, catatan);
+                }
+            });
+        }
+
+        async function prosesVerifikasi(id, status, catatan) {
             Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, {
@@ -257,12 +298,12 @@
         }
 
         async function batalSelesai(id) {
-            Swal.fire({ title: 'Ubah Jawaban?', text: 'Status akan dikembalikan ke Menunggu.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#1F2937' }).then(async (res) => {
+            Swal.fire({ title: 'Buka Kembali?', text: 'Jawaban lama akan dihapus dan status kembali ke Menunggu.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#f59e0b' }).then(async (res) => {
                 if(res.isConfirmed) {
                     await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, {
                         method: 'PATCH',
                         headers: headers,
-                        body: JSON.stringify({ jawaban: null, waktu_jawaban: null, status: 'Menunggu' })
+                        body: JSON.stringify({ jawaban: null, waktu_jawaban: null, status: 'Menunggu', status_tl: 'Belum TL' })
                     });
                     fetchAdmin();
                 }
