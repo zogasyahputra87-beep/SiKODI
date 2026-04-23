@@ -5,13 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Buat Konsultasi | SiCODI Inspektorat Kabupaten Malang</title>
-    <meta name="description" content="Ajukan konsultasi digital terkait pengelolaan keuangan, administrasi, dan pengadaan barang/jasa kepada Inspektorat Daerah Kabupaten Malang.">
-    <meta name="keywords" content="Buat Konsultasi, SiCODI, Inspektorat Malang, Pengawasan Malang, Pelayanan Publik">
-
-    <meta property="og:title" content="Buat Konsultasi Baru - SiCODI">
-    <meta property="og:description" content="Sampaikan kendala atau pertanyaan Anda melalui formulir konsultasi resmi SiCODI.">
-    <meta property="og:image" content="https://sicodi-malang.vercel.app/pages/logo_kab.png">
-    <meta property="og:type" content="website">
+    <meta name="description" content="Ajukan konsultasi digital resmi kepada Inspektorat Daerah Kabupaten Malang melalui sistem SiCODI.">
 
     <link rel="icon" type="image/png" href="../pages/logo_kab.png">
     <link rel="manifest" href="manifest.json">
@@ -22,15 +16,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
-        body {
-            user-select: none;
-            -webkit-user-select: none;
-            display: none; 
-        }
-        .profile-ring {
-            padding: 2px;
-            background: linear-gradient(to bottom right, #3b82f6, #1e40af);
-        }
+        body { user-select: none; -webkit-user-select: none; display: none; }
+        .profile-ring { padding: 2px; background: linear-gradient(to bottom right, #3b82f6, #1e40af); }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
@@ -38,48 +25,32 @@
     <div class="flex h-screen overflow-hidden relative">
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1F2937] text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
             <div class="p-6 border-b border-gray-700 flex flex-col items-center">
-                <img src="../pages/logo_kab.png" alt="Logo Kab Malang" class="w-14 mb-3 drop-shadow-md">
+                <img src="../pages/logo_kab.png" alt="Logo" class="w-14 mb-3 drop-shadow-md">
                 <div class="text-center">
                     <h1 class="text-xl font-bold text-white tracking-tight">SiCODI</h1>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight text-center">Inspektorat Daerah<br>Kabupaten Malang</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight">Inspektorat Daerah<br>Kabupaten Malang</p>
                 </div>
-                <button onclick="toggleSidebar()" class="md:hidden absolute top-4 right-4 text-gray-400">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
             </div>
             
             <nav class="flex-1 mt-6 px-4 space-y-1">
-                <a href="index.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">
-                    <span class="mr-3">📊</span> Dashboard
-                </a>
-                <a href="buat-konsultasi.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-blue-500">
-                    <span class="mr-3">➕</span> Buat Konsultasi
-                </a>
-                <a href="riwayat.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">
-                    <span class="mr-3">📂</span> Riwayat Konsultasi
-                </a>
+                <a href="index.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm"><span class="mr-3">📊</span> Dashboard</a>
+                <a href="buat-konsultasi.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-blue-500"><span class="mr-3">➕</span> Buat Konsultasi</a>
+                <a href="riwayat.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm"><span class="mr-3">📂</span> Riwayat Konsultasi</a>
             </nav>
 
             <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50">
-                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700 flex items-center justify-center">
-                    <img src="../pages/zoga.jpg" 
-                         alt="Ananda Zoga" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                         class="w-full h-full object-cover rounded-full">
-                    <div class="hidden w-full h-full items-center justify-center text-xs font-bold text-white">AZ</div>
+                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden">
+                    <img src="../pages/zoga.jpg" alt="Zoga" onerror="this.src='https://ui-avatars.com/api/?name=Ananda+Zoga'" class="w-full h-full object-cover">
                 </div>
-                <div class="text-center">
-                    <p class="text-[9px] text-blue-400 uppercase font-black tracking-tighter mb-1">Pengembang</p>
-                    <p class="text-[11px] font-bold text-gray-100 leading-tight uppercase text-center">Ananda Zoga Syahputra, S.Tr.I.P.</p>
-                </div>
-                <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition active:scale-95">Keluar Sistem</button>
+                <p class="text-[11px] font-bold text-gray-100 uppercase text-center">Ananda Zoga Syahputra, S.Tr.I.P.</p>
+                <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition active:scale-95">Keluar Sistem</button>
             </div>
         </aside>
 
         <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
         <main class="flex-1 flex flex-col overflow-y-auto">
-            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-8 h-20 flex-shrink-0">
+            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-8 h-20 flex-shrink-0 sticky top-0 z-30">
                 <div class="flex items-center">
                     <button onclick="toggleSidebar()" class="md:hidden mr-4 p-2 bg-gray-100 rounded-lg text-gray-600">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
@@ -95,7 +66,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Instansi / OPD</label>
-                                <input type="text" id="opdName" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" placeholder="Nama Instansi / OPD" required autocomplete="off">
+                                <input type="text" id="opdName" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" placeholder="Nama Instansi" required>
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Kategori</label>
@@ -112,7 +83,7 @@
 
                         <div id="otherTypeContainer" class="hidden">
                             <label class="block text-[11px] font-bold text-blue-600 uppercase mb-2 italic">Sebutkan Kategori Lainnya</label>
-                            <input type="text" id="otherConsultType" class="w-full p-3 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-400 shadow-sm">
+                            <input type="text" id="otherConsultType" class="w-full p-3 bg-white border border-blue-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-400">
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -131,7 +102,7 @@
 
                         <div>
                             <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Judul Masalah</label>
-                            <input type="text" id="subject" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" placeholder="Ringkasan topik" required autocomplete="off">
+                            <input type="text" id="subject" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" placeholder="Ringkasan topik" required>
                         </div>
 
                         <div>
@@ -142,17 +113,17 @@
                         <div class="p-4 bg-blue-50/50 border-2 border-dashed border-blue-200 rounded-2xl">
                             <label class="block text-[10px] font-bold text-blue-600 uppercase mb-2 tracking-widest text-center">Lampiran Dokumen (Opsional)</label>
                             <input type="file" id="fileInput" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
-                            <p class="mt-2 text-[9px] text-gray-400 text-center italic">* Maksimal 5MB (PDF/JPG/PNG)</p>
+                            <p class="mt-2 text-[9px] text-gray-400 text-center italic">* Maksimal 5MB (PDF/JPG/PNG) akan disimpan di GDrive</p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">WhatsApp</label>
-                                <input type="tel" id="whatsapp" placeholder="0812xxxx" class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" required autocomplete="off">
+                                <input type="tel" id="whatsapp" placeholder="0812xxxx" class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" required>
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Email</label>
-                                <input type="email" id="email" placeholder="contoh@malangkab.go.id" class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" required autocomplete="off">
+                                <input type="email" id="email" placeholder="contoh@malangkab.go.id" class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" required>
                             </div>
                         </div>
 
@@ -166,6 +137,13 @@
     </div>
 
     <script>
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = "https://ID_PROYEK_KAMU.supabase.co"; 
+        const SUPABASE_KEY = "API_KEY_ANON_KAMU";
+        
+        // --- KONFIGURASI APPS SCRIPT (KHUSUS UNTUK UPLOAD FILE KE GDRIVE) ---
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7CDn0iJ48mX2NcNosdCAH-P1LZESQN76wKgTrqgcly-BvYxwaQbaAj65bEyidfqZ/exec";
+
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'login.html';
@@ -175,13 +153,6 @@
         })();
 
         document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = function(e) {
-            if (e.keyCode == 123) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
-        };
-
-        const API_URL = "https://script.google.com/macros/s/AKfycbxI7CDn0iJ48mX2NcNosdCAH-P1LZESQN76wKgTrqgcly-BvYxwaQbaAj65bEyidfqZ/exec";
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
@@ -189,114 +160,112 @@
         }
 
         function logout() {
-            Swal.fire({
-                title: 'Keluar Sistem?',
-                text: "Anda akan kembali ke halaman login.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#1F2937',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Keluar!',
-                cancelButtonText: 'Batal',
-                customClass: { popup: 'rounded-3xl' }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    sessionStorage.clear();
-                    window.location.href = 'login.html';
-                }
-            })
+            sessionStorage.clear();
+            window.location.href = 'login.html';
         }
 
         function toggleOtherInput() {
             const selectVal = document.getElementById('consultType').value;
-            const container = document.getElementById('otherTypeContainer');
-            container.classList.toggle('hidden', selectVal !== 'Lainnya');
+            document.getElementById('otherTypeContainer').classList.toggle('hidden', selectVal !== 'Lainnya');
         }
 
         function toggleTanggal() {
             const metode = document.getElementById('metode').value;
             const wrap = document.getElementById('wrap-tanggal');
             wrap.classList.toggle('hidden', metode !== 'Offline');
-            if(metode === 'Offline') document.getElementById('tgl_offline').required = true;
-            else document.getElementById('tgl_offline').required = false;
+            document.getElementById('tgl_offline').required = (metode === 'Offline');
         }
 
         document.getElementById('consultForm').addEventListener('submit', function(e) {
             e.preventDefault();
             Swal.fire({
                 title: 'Kirim Konsultasi?',
-                text: "Pastikan data yang Anda masukkan sudah benar.",
+                text: "Data akan disimpan secara aman di sistem.",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#1F2937',
-                cancelButtonColor: '#aaa',
-                confirmButtonText: 'Ya, Kirim Sekarang!',
-                cancelButtonText: 'Cek Kembali',
+                confirmButtonText: 'Ya, Kirim!',
+                cancelButtonText: 'Batal',
                 customClass: { popup: 'rounded-3xl' }
             }).then((result) => {
-                if (result.isConfirmed) {
-                    prosesKirimData();
-                }
+                if (result.isConfirmed) prosesSimpan();
             });
         });
 
-        async function prosesKirimData() {
+        async function prosesSimpan() {
             const btn = document.getElementById('btnSubmit');
             const fileInput = document.getElementById('fileInput');
             btn.disabled = true;
-            btn.innerHTML = `<span class="inline-block animate-spin mr-2">⏳</span> SEDANG MENGUNGGAH...`;
+            btn.innerHTML = `<span class="inline-block animate-spin mr-2">⏳</span> SEDANG MEMPROSES...`;
 
-            let fileData = { data: "", name: "", type: "" };
+            let gDriveLink = "-";
+
+            // 1. JIKA ADA FILE, UPLOAD DULU KE GDRIVE VIA APPS SCRIPT
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                fileData = await new Promise((resolve) => {
+                const base64 = await new Promise((resolve) => {
                     const reader = new FileReader();
-                    reader.onload = (e) => resolve({
-                        data: e.target.result.split(",")[1],
-                        name: file.name,
-                        type: file.type
-                    });
+                    reader.onload = (e) => resolve(e.target.result.split(",")[1]);
                     reader.readAsDataURL(file);
                 });
+
+                try {
+                    const uploadRes = await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: "upload_only", // Buat fungsi baru di Apps Script untuk upload saja
+                            fileData: base64,
+                            fileName: file.name,
+                            fileType: file.type
+                        })
+                    });
+                    const uploadResult = await uploadRes.json();
+                    gDriveLink = uploadResult.fileLink; // Ambil link hasil upload
+                } catch (err) {
+                    console.error("Gagal upload ke Drive, lanjut tanpa file.");
+                }
             }
 
-            const formData = {
-                action: "tambah_konsultasi",
-                opd: document.getElementById('opdName').value,
+            // 2. SIMPAN DATA TEKS KE SUPABASE
+            const payload = {
+                instansi: document.getElementById('opdName').value,
                 kategori: (document.getElementById('consultType').value === 'Lainnya') ? document.getElementById('otherConsultType').value : document.getElementById('consultType').value,
                 metode: document.getElementById('metode').value,
-                tgl_offline: document.getElementById('tgl_offline').value || "-",
-                judul: document.getElementById('subject').value,
-                issue: document.getElementById('issue').value,
-                whatsapp: document.getElementById('whatsapp').value,
+                tanggal_offline: document.getElementById('tgl_offline').value || "-",
+                judul_masalah: document.getElementById('subject').value,
+                rincian_masalah: document.getElementById('issue').value,
+                nomor_hp: document.getElementById('whatsapp').value,
                 email: document.getElementById('email').value,
-                fileData: fileData.data,
-                fileName: fileData.name,
-                fileType: fileData.type
+                lampiran: gDriveLink,
+                username: sessionStorage.getItem('userName'),
+                status_tl: "Belum TL"
             };
 
             try {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify(formData) });
-                Swal.fire({
-                    title: 'BERHASIL!',
-                    text: 'Konsultasi Anda telah diterima Inspektorat.',
-                    icon: 'success',
-                    showConfirmButton: false,
-                    timer: 2000,
-                    customClass: { popup: 'rounded-3xl' }
-                }).then(() => {
-                    window.location.href = "riwayat.html";
+                const res = await fetch(`${https://afaiwyfodjllolzwbhmz.supabase.co}/rest/v1/konsultasi`, {
+                    method: 'POST',
+                    headers: {
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
                 });
+
+                if (res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'TERKIRIM!',
+                        text: 'Konsultasi berhasil disimpan di Supabase.',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        customClass: { popup: 'rounded-3xl' }
+                    }).then(() => window.location.href = "riwayat.html");
+                }
             } catch (err) {
-                Swal.fire({
-                    title: 'TERKIRIM!',
-                    text: 'Data sedang diproses. Silakan cek menu riwayat.',
-                    icon: 'info',
-                    confirmButtonColor: '#1F2937',
-                    customClass: { popup: 'rounded-3xl' }
-                }).then(() => {
-                    window.location.href = "riwayat.html";
-                });
+                Swal.fire('Error', 'Gagal menyimpan ke database.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = "Kirim Pengajuan";
             }
         }
     </script>
