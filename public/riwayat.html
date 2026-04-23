@@ -30,6 +30,7 @@
         .timeline-error::before { background: #ef4444; }
         .preview-container { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; margin-top: 0.5rem; background: #f9fafb; }
         .preview-iframe { width: 100%; height: 100%; border: none; }
+        .stat-mini-card { @apply bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center transition-all hover:shadow-md; }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 overflow-hidden">
@@ -100,6 +101,25 @@
             </header>
 
             <div class="p-6 md:p-10">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-mini-card">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Konsultasi Saya</p>
+                        <h3 id="user-stat-total" class="text-xl font-black text-gray-800">0</h3>
+                    </div>
+                    <div class="stat-mini-card">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Menunggu Jawaban</p>
+                        <h3 id="user-stat-pending" class="text-xl font-black text-yellow-600">0</h3>
+                    </div>
+                    <div class="stat-mini-card">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Perlu Tindak Lanjut</p>
+                        <h3 id="user-stat-tl" class="text-xl font-black text-blue-600">0</h3>
+                    </div>
+                    <div class="stat-mini-card">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Selesai / Tuntas</p>
+                        <h3 id="user-stat-done" class="text-xl font-black text-teal-600">0</h3>
+                    </div>
+                </div>
+
                 <div class="mb-6 max-w-2xl">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Pencarian Data Saya</label>
                     <div class="relative group">
@@ -177,19 +197,42 @@
         async function loadData() {
             const currentUser = sessionStorage.getItem('userName');
             const currentRole = sessionStorage.getItem('userRole');
+            const myWilayah = sessionStorage.getItem('wilayah');
             
+            // --- LOGIKA FILTER WILAYAH & USER ---
             let queryUrl = `${SUPABASE_URL}/rest/v1/konsultasi?select=*&order=waktu_pengajuan.desc`;
+            
             if (currentRole !== 'admin') {
+                // OPD: Hanya lihat data miliknya sendiri
                 queryUrl += `&username=eq.${currentUser}`;
+            } else if (myWilayah && myWilayah !== 'semua') {
+                // Admin Irban: Filter berdasarkan wilayah_opd
+                queryUrl += `&wilayah_opd=eq.${myWilayah}`;
             }
 
             try {
                 const res = await fetch(queryUrl, { method: "GET", headers: headers });
                 rawRiwayat = await res.json();
+                
+                // Hitung Statistik Privat Akun
+                updateUserStats(rawRiwayat);
+                
                 renderRiwayat(rawRiwayat);
             } catch (e) {
                 document.getElementById('loader').innerText = "⚠️ Gagal memuat data.";
             }
+        }
+
+        function updateUserStats(data) {
+            const total = data.length;
+            const pending = data.filter(item => !item.jawaban || item.jawaban === "").length;
+            const needsTl = data.filter(item => (item.jawaban && item.jawaban !== "") && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length;
+            const done = data.filter(item => item.status_tl === "Tuntas").length;
+
+            document.getElementById('user-stat-total').innerText = total;
+            document.getElementById('user-stat-pending').innerText = pending;
+            document.getElementById('user-stat-tl').innerText = needsTl;
+            document.getElementById('user-stat-done').innerText = done;
         }
 
         function renderRiwayat(dataToRender) {
