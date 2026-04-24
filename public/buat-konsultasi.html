@@ -5,12 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Buat Konsultasi | SiCODI Inspektorat Kabupaten Malang</title>
-    <meta name="description" content="Ajukan konsultasi digital resmi kepada Inspektorat Daerah Kabupaten Malang melalui sistem SiCODI.">
 
     <link rel="icon" type="image/png" href="../pages/logo_kab.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1F2937">
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -79,7 +75,6 @@
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Instansi Utama</label>
                                 <input type="text" id="opdName" class="w-full p-3 bg-gray-100 border border-gray-200 rounded-xl outline-none text-gray-500 font-bold cursor-not-allowed" readonly>
-                                <p class="mt-1 text-[9px] text-gray-400 italic">* Otomatis sesuai akun login</p>
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Kategori Masalah</label>
@@ -96,7 +91,7 @@
 
                         <div id="wrap-desa" class="hidden animate__animated animate__fadeIn">
                             <label class="block text-[11px] font-bold text-blue-600 uppercase mb-2 italic">Detail Nama Desa / Kelurahan / Unit</label>
-                            <input type="text" id="namaDesa" class="w-full p-3 bg-blue-50 border border-blue-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" placeholder="Contoh: Desa Talangagung atau Kelurahan Ardirejo">
+                            <input type="text" id="namaDesa" class="w-full p-3 bg-blue-50 border border-blue-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" placeholder="Masukkan nama Desa atau Kelurahan...">
                         </div>
 
                         <div id="otherTypeContainer" class="hidden">
@@ -125,18 +120,17 @@
 
                         <div>
                             <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Rincian Permasalahan</label>
-                            <textarea id="issue" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" rows="4" placeholder="Jelaskan detail kendala atau pertanyaan Anda..." required></textarea>
+                            <textarea id="issue" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" rows="4" placeholder="Jelaskan detail kendala..." required></textarea>
                         </div>
 
-                        <div class="p-4 bg-blue-50/50 border-2 border-dashed border-blue-200 rounded-2xl">
-                            <label class="block text-[10px] font-bold text-blue-600 uppercase mb-2 tracking-widest text-center">Lampiran Dokumen Pendukung (Opsional)</label>
+                        <div class="p-4 bg-blue-50/50 border-2 border-dashed border-blue-200 rounded-2xl text-center">
+                            <label class="block text-[10px] font-bold text-blue-600 uppercase mb-2 tracking-widest">Lampiran Dokumen (Opsional)</label>
                             <input type="file" id="fileInput" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
-                            <p class="mt-2 text-[9px] text-gray-400 text-center italic">* Maksimal 5MB (PDF/Gambar)</p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Nomor WhatsApp (Aktif)</label>
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Nomor WhatsApp</label>
                                 <input type="tel" id="whatsapp" placeholder="0812xxxx" class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" required>
                             </div>
                             <div>
@@ -146,7 +140,7 @@
                         </div>
 
                         <button id="btnSubmit" type="submit" class="w-full bg-gray-800 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-gray-900 transition-all active:scale-95 uppercase tracking-widest disabled:bg-gray-400">
-                            Kirim Pengajuan Konsultasi
+                            Kirim Pengajuan
                         </button>
                     </form>
                 </div>
@@ -166,14 +160,12 @@
             } else {
                 document.body.style.display = "block";
                 const name = sessionStorage.getItem('namaOpd') || "";
-                const user = sessionStorage.getItem('userName');
+                const user = sessionStorage.getItem('userName') || "";
                 
                 document.getElementById('opdName').value = name;
 
-                // LOGIKA DETEKSI: Kecamatan atau Kelurahan
-                // Menggunakan toLowerCase agar deteksi tidak gagal meski di database huruf besar
-                const lowerName = name.toLowerCase();
-                if (lowerName.includes('kecamatan') || lowerName.includes('kelurahan')) {
+                // LOGIKA SEDERHANA: Deteksi kata "KEC" di username
+                if (user.toUpperCase().includes('KEC')) {
                     document.getElementById('wrap-desa').classList.remove('hidden');
                 }
                 
@@ -183,17 +175,12 @@
             }
         })();
 
-        document.addEventListener('contextmenu', e => e.preventDefault());
-
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
             document.getElementById('overlay').classList.toggle('hidden');
         }
 
-        function logout() {
-            sessionStorage.clear();
-            window.location.href = 'login.html';
-        }
+        function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
 
         function toggleOtherInput() {
             const selectVal = document.getElementById('consultType').value;
@@ -218,9 +205,7 @@
                 confirmButtonText: 'Ya, Kirim!',
                 cancelButtonText: 'Batal',
                 customClass: { popup: 'rounded-3xl' }
-            }).then((result) => {
-                if (result.isConfirmed) prosesSimpan();
-            });
+            }).then((result) => { if (result.isConfirmed) prosesSimpan(); });
         });
 
         async function prosesSimpan() {
@@ -250,12 +235,8 @@
                         })
                     });
                     const uploadResult = await uploadRes.json();
-                    if (uploadResult.status === "success") {
-                        gDriveLink = uploadResult.fileLink;
-                    }
-                } catch (err) {
-                    console.error("Gagal upload file.");
-                }
+                    if (uploadResult.status === "success") gDriveLink = uploadResult.fileLink;
+                } catch (err) { console.error("Gagal upload file."); }
             }
 
             // GABUNGKAN NAMA INSTANSI
@@ -292,20 +273,13 @@
 
                 if (res.ok) {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'BERHASIL!',
-                        text: 'Konsultasi Anda telah masuk ke sistem.',
-                        timer: 2000,
-                        showConfirmButton: false,
-                        customClass: { popup: 'rounded-3xl' }
+                        icon: 'success', title: 'BERHASIL!', text: 'Konsultasi telah masuk ke sistem.', timer: 2000, showConfirmButton: false, customClass: { popup: 'rounded-3xl' }
                     }).then(() => window.location.href = "riwayat.html");
-                } else {
-                    throw new Error("Gagal menyimpan data.");
-                }
+                } else { throw new Error("Gagal menyimpan data."); }
             } catch (err) {
                 Swal.fire('Error', err.message, 'error');
                 btn.disabled = false;
-                btn.innerHTML = "Kirim Pengajuan Konsultasi";
+                btn.innerHTML = "Kirim Pengajuan";
             }
         }
     </script>
