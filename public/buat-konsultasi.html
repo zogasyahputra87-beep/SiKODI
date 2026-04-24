@@ -77,7 +77,7 @@
                     <form id="consultForm" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Instansi / OPD</label>
+                                <label class="block text-[11px] font-bold text-gray-400 uppercase mb-2">Instansi / Kecamatan</label>
                                 <input type="text" id="opdName" class="w-full p-3 bg-gray-100 border border-gray-200 rounded-xl outline-none text-gray-500 font-bold cursor-not-allowed" readonly>
                                 <p class="mt-1 text-[9px] text-gray-400 italic">* Otomatis sesuai akun login</p>
                             </div>
@@ -92,6 +92,11 @@
                                     <option value="Lainnya">Lainnya</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div id="wrap-desa" class="hidden animate__animated animate__fadeIn">
+                            <label class="block text-[11px] font-bold text-blue-600 uppercase mb-2 italic">Asal Desa / Kelurahan</label>
+                            <input type="text" id="namaDesa" class="w-full p-3 bg-blue-50 border border-blue-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition" placeholder="Sebutkan nama Desa atau Kelurahan terkait...">
                         </div>
 
                         <div id="otherTypeContainer" class="hidden">
@@ -165,6 +170,11 @@
                 
                 // Set Otomatis Nama OPD di Form
                 document.getElementById('opdName').value = name;
+
+                // LOGIKA: Jika nama OPD mengandung kata "Kecamatan", tampilkan input Nama Desa
+                if (name.toLowerCase().includes('kecamatan')) {
+                    document.getElementById('wrap-desa').classList.remove('hidden');
+                }
                 
                 // Update Header User Profile
                 document.getElementById('head-opd-name').innerText = name;
@@ -250,8 +260,14 @@
             }
 
             // 2. SIMPAN KE SUPABASE
+            const namaOpdAsli = sessionStorage.getItem('namaOpd');
+            const namaDesa = document.getElementById('namaDesa').value;
+            
+            // Format Final: "Kecamatan Kepanjen (Desa Talangagung)" jika input desa diisi
+            const instansiFinal = namaDesa.trim() !== "" ? `${namaOpdAsli} (${namaDesa})` : namaOpdAsli;
+
             const payload = {
-                instansi: sessionStorage.getItem('namaOpd'),
+                instansi: instansiFinal,
                 kategori: (document.getElementById('consultType').value === 'Lainnya') ? document.getElementById('otherConsultType').value : document.getElementById('consultType').value,
                 metode: document.getElementById('metode').value,
                 tanggal_offline: document.getElementById('tgl_offline').value || "-",
@@ -261,11 +277,7 @@
                 email: document.getElementById('email').value,
                 lampiran: gDriveLink,
                 username: sessionStorage.getItem('userName'),
-                
-                // --- PENYESUAIAN WILAYAH ---
-                // Mengambil nilai wilayah dari session agar admin irban bisa memfilter
                 wilayah_opd: sessionStorage.getItem('wilayah'),
-                
                 status_tl: "Belum TL"
             };
 
