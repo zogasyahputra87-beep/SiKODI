@@ -20,11 +20,44 @@
         .stat-card { @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-md bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center; }
         .spin { animation: rotate 0.8s linear; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* --- WATERMARK LOGO GLOBAL --- */
+        .watermark-fixed {
+            position: fixed;
+            bottom: -30px;
+            right: -30px;
+            width: 300px;
+            height: 300px;
+            background-image: url('../pages/logo_kab.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.04;
+            z-index: 0;
+            pointer-events: none;
+            transform: rotate(-15deg);
+        }
+
+        /* --- WATERMARK TEKS DI KOTAK BIRU --- */
+        .text-watermark {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 40px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.05); /* Transparansi 5% */
+            letter-spacing: 4px;
+            pointer-events: none;
+            user-select: none;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 overflow-hidden">
 
-    <div class="flex h-screen overflow-hidden relative">
+    <div class="watermark-fixed"></div>
+
+    <div class="flex h-screen overflow-hidden relative z-10">
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1F2937] text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
             <div class="p-6 border-b border-gray-700 flex flex-col items-center">
                 <img src="../pages/logo_kab.png" alt="Logo" class="w-14 mb-3 drop-shadow-md">
@@ -122,6 +155,8 @@
                 </div>
 
                 <div class="bg-gray-800 text-white p-8 rounded-3xl shadow-xl border border-gray-700 relative overflow-hidden">
+                    <div class="text-watermark">ITDA KAB. MLG</div>
+                    
                     <div class="relative z-10">
                         <h3 class="text-2xl font-black mb-2 text-blue-400 uppercase tracking-tighter">Portal SiCODI Kabupaten Malang</h3>
                         <p class="text-gray-400 text-sm leading-relaxed mb-6 max-w-2xl">
@@ -162,12 +197,9 @@
 
                 if(role === 'admin') document.getElementById('admin-link').classList.remove('hidden');
                 
-                // Update Header User Profile
                 document.getElementById('head-opd-name').innerText = name;
                 document.getElementById('head-username').innerText = '@' + user;
                 document.getElementById('head-initials').innerText = name.substring(0,2).toUpperCase();
-                
-                // Update Welcome Message
                 document.getElementById('welcome-opd').innerText = name;
             }
         })();
@@ -198,7 +230,6 @@
         }
 
         async function updateStats() {
-            // STATISTIK GLOBAL (SEMUA DATA)
             let queryUrl = `${SUPABASE_URL}/rest/v1/konsultasi?select=status_tl,jawaban`;
 
             try {
