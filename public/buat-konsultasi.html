@@ -13,7 +13,24 @@
     
     <style>
         body { user-select: none; -webkit-user-select: none; display: none; }
-        .profile-ring { padding: 2px; background: linear-gradient(to bottom right, #3b82f6, #1e40af); }
+        .profile-ring { padding: 2px; background: linear-gradient(to bottom right, #3b82f6, #1e40af); } }
+
+        /* --- WATERMARK LOGO GLOBAL --- */
+        .watermark-fixed {
+            position: fixed;
+            bottom: -30px;
+            right: -30px;
+            width: 500px;
+            height: 500px;
+            background-image: url('../pages/inspektorat.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.1;
+            z-index: 0;
+            pointer-events: none;
+            transform: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
