@@ -40,11 +40,13 @@
             pointer-events: none;
             transform: none;
         }
-
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 overflow-hidden">
-    <div class="flex h-screen overflow-hidden relative">
+
+    <div class="watermark-fixed"></div>
+
+    <div class="flex h-screen overflow-hidden relative z-10">
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1F2937] text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
             <div class="p-6 border-b border-gray-700 flex flex-col items-center">
                 <img src="../pages/logo_kab.png" alt="Logo" class="w-14 mb-3 drop-shadow-md">
@@ -91,7 +93,7 @@
                 </div>
             </header>
 
-            <div class="p-8">
+            <div class="p-8 relative z-10">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                     <div class="admin-stat-card border-l-4 border-l-blue-500">
                         <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total Masuk</p>
@@ -163,7 +165,6 @@
 
         async function fetchAdmin() {
             const loader = document.getElementById('loader');
-            // Menghilangkan spasi dan paksa huruf kecil untuk pengecekan "semua"
             const myWilayahRaw = sessionStorage.getItem('wilayah') || 'semua';
             const myWilayah = myWilayahRaw.trim().toLowerCase();
             
@@ -171,7 +172,6 @@
 
             let queryUrl = `${SUPABASE_URL}/rest/v1/konsultasi?select=*&order=waktu_pengajuan.desc`;
             
-            // LOGIKA FILTER: Jika BUKAN "semua", maka filter berdasarkan kolom wilayah_opd
             if (myWilayah !== 'semua') {
                 queryUrl += `&wilayah_opd=eq.${sessionStorage.getItem('wilayah')}`;
             }
@@ -179,10 +179,7 @@
             try {
                 const res = await fetch(queryUrl, { headers: headers });
                 rawData = await res.json();
-                
                 loader.classList.add('hidden');
-                
-                // Panggil statistik untuk data yang berhasil ditarik
                 updateAdminStats(rawData);
                 renderTable(rawData);
             } catch (e) { 
@@ -261,11 +258,7 @@
                 try {
                     const res = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, {
                         method: 'PATCH',
-                        headers: { 
-                            "apikey": SUPABASE_KEY, 
-                            "Authorization": `Bearer ${SUPABASE_KEY}`,
-                            "Content-Type": "application/json"
-                        },
+                        headers: headers,
                         body: JSON.stringify({ 
                             jawaban: reply, 
                             waktu_jawaban: new Date().toISOString() 
@@ -289,7 +282,7 @@
             if(isConfirmed) {
                 await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, {
                     method: 'PATCH',
-                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
+                    headers: headers,
                     body: JSON.stringify({ jawaban: null, waktu_jawaban: null })
                 });
                 fetchAdmin();
