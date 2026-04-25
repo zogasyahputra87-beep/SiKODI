@@ -13,6 +13,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         body { user-select: none; -webkit-user-select: none; display: none; }
@@ -32,13 +33,12 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            opacity: 0.5;
+            opacity: 0.5; /* KEMBALI KE 0.5 */
             z-index: 0;
             pointer-events: none;
             transform: none;
         }
 
-        /* --- WATERMARK TEKS DI KOTAK BIRU --- */
         .text-watermark {
             position: absolute;
             bottom: 10px;
@@ -112,6 +112,11 @@
                 </div>
                 
                 <div class="flex items-center space-x-4">
+                    <div class="hidden lg:flex flex-col text-right border-r border-gray-200 pr-4">
+                        <p id="realtime-clock" class="text-xs font-black text-gray-800 leading-none mb-1">00:00:00</p>
+                        <p id="realtime-date" class="text-[8px] text-gray-400 uppercase font-bold tracking-widest">Memuat...</p>
+                    </div>
+
                     <button onclick="manualRefresh()" id="btn-refresh" class="flex items-center space-x-2 bg-gray-50 hover:bg-gray-100 text-gray-600 px-3 py-2 rounded-xl border border-gray-200 transition active:scale-95 shadow-sm">
                         <span id="icon-refresh">🔄</span>
                         <span class="hidden md:inline text-[10px] font-bold uppercase tracking-widest font-black">Refresh</span>
@@ -129,8 +134,8 @@
                 </div>
             </header>
 
-            <div class="p-6 md:p-8 max-w-7xl mx-auto w-full">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div class="p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                     <div class="stat-card border-b-4 border-b-blue-500">
                         <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-3 text-lg">📋</div>
                         <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Konsultasi</p>
@@ -159,21 +164,34 @@
                     </div>
                 </div>
 
-                <div class="bg-gray-800 text-white p-8 rounded-3xl shadow-xl border border-gray-700 relative overflow-hidden">
-                    <div class="text-watermark">ITDA KAB. MLG</div>
-                    <div class="relative z-10">
-                        <h3 class="text-2xl font-black mb-2 text-blue-400 uppercase tracking-tighter">Portal SiCODI Kabupaten Malang</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed mb-6 max-w-2xl">
-                            Selamat Datang, <span id="welcome-opd" class="text-white font-bold">Instansi</span>. Sistem ini dibuat untuk mempermudah Koordinasi Pembinaan dan Pengawasan di Lingkungan Pemerintah Kabupaten Malang.
-                        </p>
-                        <div class="flex flex-wrap gap-3">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-sm font-black text-gray-800 uppercase tracking-tighter">Grafik Progres Tahunan</h3>
+                                <p class="text-[9px] text-gray-400 uppercase font-bold tracking-widest">Trend Konsultasi Per Bulan</p>
+                            </div>
+                            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase" id="current-year-label">2026</span>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="yearlyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-800 text-white p-8 rounded-3xl shadow-xl border border-gray-700 relative overflow-hidden flex flex-col justify-center">
+                        <div class="text-watermark">ITDA KAB. MLG</div>
+                        <div class="relative z-10">
+                            <h3 class="text-xl font-black mb-2 text-blue-400 uppercase tracking-tighter">SiCODI Portal</h3>
+                            <p class="text-gray-400 text-xs leading-relaxed mb-6">
+                                Selamat Datang, <span id="welcome-opd" class="text-white font-bold">Instansi</span>. Sistem ini mempermudah Koordinasi Pembinaan dan Pengawasan di Lingkungan Pemerintah Kabupaten Malang.
+                            </p>
                             <div class="inline-flex items-center px-4 py-2 bg-gray-700/50 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-300 border border-gray-600">
                                 <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-ping"></span>
                                 Status: <span class="ml-1 text-green-400">Online</span>
                             </div>
                         </div>
+                        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl"></div>
                     </div>
-                    <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
                 </div>
             </div>
         </main>
@@ -183,6 +201,8 @@
         const SUPABASE_URL = "https://afaiwyfodjllolzwbhmz.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_0Jj5RTBAL3gewJvwOsvAxA_aPu370Bl";
         const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` };
+        
+        let myChart;
 
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
@@ -197,8 +217,49 @@
                 document.getElementById('head-username').innerText = '@' + user;
                 document.getElementById('head-initials').innerText = name.substring(0,2).toUpperCase();
                 document.getElementById('welcome-opd').innerText = name;
+                document.getElementById('current-year-label').innerText = new Date().getFullYear();
+                startClock();
+                initChart();
             }
         })();
+
+        function startClock() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('realtime-clock').innerText = now.toLocaleTimeString('id-ID', { hour12: false });
+                document.getElementById('realtime-date').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            }, 1000);
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('yearlyChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                    datasets: [{
+                        label: 'Jumlah Konsultasi',
+                        data: Array(12).fill(0),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#3b82f6',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+        }
 
         async function manualRefresh() {
             const icon = document.getElementById('icon-refresh');
@@ -213,17 +274,13 @@
 
         async function updateStats() {
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?select=status_tl,jawaban`, { headers: headers });
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?select=status_tl,jawaban,waktu_pengajuan`, { headers: headers });
                 const data = await response.json();
                 
                 const total = data.length;
-                // 1. Menunggu Jawaban: Belum ada jawaban dari Auditor
                 const pending = data.filter(item => !item.jawaban || item.jawaban === "").length;
-                // 2. Proses TL: Sudah dijawab Auditor tapi user belum kirim bukti (Belum TL / Perlu Perbaikan)
                 const prosesTl = data.filter(item => (item.jawaban && item.jawaban !== "") && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length;
-                // 3. Verifikasi TL: User sudah kirim bukti, sedang dicek Auditor
                 const verifTl = data.filter(item => item.status_tl === 'Menunggu Verifikasi').length;
-                // 4. Tuntas: Selesai
                 const tuntas = data.filter(item => item.status_tl === 'Tuntas').length;
 
                 document.getElementById('stat-total').innerText = total;
@@ -231,6 +288,19 @@
                 document.getElementById('stat-proses-tl').innerText = prosesTl;
                 document.getElementById('stat-verif').innerText = verifTl;
                 document.getElementById('stat-done').innerText = tuntas;
+
+                // Proses data untuk grafik (Berdasarkan Tahun Berjalan)
+                const monthlyData = Array(12).fill(0);
+                const currentYear = new Date().getFullYear();
+                data.forEach(item => {
+                    const date = new Date(item.waktu_pengajuan);
+                    if(date.getFullYear() === currentYear) {
+                        monthlyData[date.getMonth()]++;
+                    }
+                });
+                
+                myChart.data.datasets[0].data = monthlyData;
+                myChart.update();
 
                 document.getElementById('ping-tl').classList.toggle('hidden', verifTl === 0);
                 ['stat-total', 'stat-pending', 'stat-proses-tl', 'stat-verif', 'stat-done'].forEach(id => document.getElementById(id).classList.remove('animate-pulse'));
