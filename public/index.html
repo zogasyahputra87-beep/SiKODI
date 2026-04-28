@@ -49,7 +49,7 @@
                 <img src="../pages/logo_kab.png" alt="Logo" class="w-14 mb-3 drop-shadow-md">
                 <div class="text-center">
                     <h1 class="text-xl font-bold text-white tracking-tight">PAMAN SIGIT</h1>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight">Inspektorat Daerah<br>Kabupaten Malang</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight text-center">Inspektorat Daerah<br>Kabupaten Malang</p>
                 </div>
             </div>
             <nav class="flex-1 mt-6 px-4 space-y-1">
@@ -188,6 +188,7 @@
         
         let myChart;
 
+        // --- INISIALISASI HALAMAN ---
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'login.html';
@@ -207,10 +208,14 @@
                 
                 startClock();
                 initChart();
+                
+                // LANGSUNG JALANKAN FETCHING DATA SAAT START
+                updateStats(); 
                 fetchProfilTerbaru();
             }
         })();
 
+        // --- FUNGSI PROFIL ---
         function toggleProfileMenu() {
             const menu = document.getElementById('profile-menu');
             menu.classList.toggle('menu-hidden');
@@ -224,7 +229,7 @@
                 const data = await res.json();
                 if (data.length > 0 && data[0].foto_profil) {
                     let finalUrl = data[0].foto_profil;
-                    // FIX: Konversi link Google Drive ke Direct Link
+                    // Fix link Google Drive
                     if (finalUrl.includes('drive.google.com')) {
                         const fileId = finalUrl.split('/d/')[1]?.split('/')[0] || finalUrl.split('id=')[1];
                         if(fileId) finalUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
@@ -245,7 +250,7 @@
             });
 
             if (file) {
-                if(file.size > 2 * 1024 * 1024) return Swal.fire('Error', 'Ukuran file maksimal 2MB', 'error');
+                if(file.size > 2 * 1024 * 1024) return Swal.fire('Error', 'Maks 2MB', 'error');
                 Swal.fire({ title: 'Mengunggah...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -263,10 +268,10 @@
                                 headers: { ...headers, "Content-Type": "application/json" },
                                 body: JSON.stringify({ foto_profil: uploadResult.fileLink })
                             });
-                            Swal.fire({ icon: 'success', title: 'Foto Profil Diperbarui!', timer: 1500, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
+                            Swal.fire({ icon: 'success', title: 'Berhasil!', timer: 1500, showConfirmButton: false });
                             fetchProfilTerbaru();
                         } else { throw new Error(); }
-                    } catch (err) { Swal.fire('Error', 'Gagal memperbarui profil.', 'error'); }
+                    } catch (err) { Swal.fire('Error', 'Gagal update.', 'error'); }
                 };
             }
         }
@@ -296,11 +301,12 @@
                         headers: { ...headers, "Content-Type": "application/json" },
                         body: JSON.stringify({ password: pass })
                     });
-                    Swal.fire({ icon: 'success', title: 'Password Berhasil Diubah!', timer: 1500, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
-                } catch (error) { Swal.fire('Error', 'Gagal mengubah password.', 'error'); }
+                    Swal.fire({ icon: 'success', title: 'Berhasil!', timer: 1500, showConfirmButton: false });
+                } catch (error) { Swal.fire('Error', 'Gagal update.', 'error'); }
             }
         }
 
+        // --- FUNGSI CORE DASHBOARD ---
         function startClock() {
             setInterval(() => {
                 const now = new Date();
@@ -328,17 +334,11 @@
             });
         }
 
-        async function manualRefresh() {
-            const icon = document.getElementById('icon-refresh');
-            icon.classList.add('spin'); 
-            await updateStats();
-            setTimeout(() => icon.classList.remove('spin'), 800);
-        }
-
         async function updateStats() {
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?select=status_tl,jawaban,waktu_pengajuan`, { headers: headers });
                 const data = await response.json();
+                
                 document.getElementById('stat-total').innerText = data.length;
                 document.getElementById('stat-pending').innerText = data.filter(item => !item.jawaban).length;
                 document.getElementById('stat-proses-tl').innerText = data.filter(item => item.jawaban && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length;
@@ -354,13 +354,20 @@
                 myChart.data.datasets[0].data = monthlyData;
                 myChart.update();
                 document.getElementById('ping-tl').classList.toggle('hidden', v === 0);
-            } catch (error) { console.error(error); }
+            } catch (error) { console.error("Gagal update statistik."); }
+        }
+
+        async function manualRefresh() {
+            const icon = document.getElementById('icon-refresh');
+            icon.classList.add('spin'); 
+            await updateStats();
+            setTimeout(() => icon.classList.remove('spin'), 800);
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
         function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
 
-        // CLOSE DROPDOWN LOGIC FIXED
+        // Logic tutup dropdown
         window.addEventListener('click', function(e) {
             const menu = document.getElementById('profile-menu');
             const btn = document.getElementById('profile-btn');
