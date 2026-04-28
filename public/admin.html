@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | PAMAN SIGIT Inspektorat Kabupaten Malang</title>
+    <title>Admin Panel | PAMAN SIGIT</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="../pages/logo_kab.png">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
@@ -21,7 +24,6 @@
         .admin-stat-card { @apply bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col transition-all hover:shadow-md cursor-pointer hover:-translate-y-1; }
         .preview-container { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; margin-top: 0.75rem; background: #f9fafb; }
         .preview-iframe { width: 100%; height: 100%; border: none; }
-        
         .bg-paman-dark { background-color: #1F2937; }
 
         .watermark-fixed {
@@ -82,8 +84,14 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <button onclick="exportAdminPDF()" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-[10px] font-bold border border-red-100 hover:bg-red-100 uppercase shadow-sm transition active:scale-95">📄 Cetak Rekap</button>
+                    <button id="btn-start-print" onclick="togglePrintMode(true)" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-[10px] font-bold border border-red-100 hover:bg-red-100 uppercase shadow-sm transition active:scale-95">📄 Cetak Rekap</button>
                     
+                    <div id="print-options" class="hidden flex items-center space-x-2 animate__animated animate__fadeInRight">
+                        <button onclick="exportAdminData('pdf')" class="bg-red-600 text-white px-3 py-2 rounded-lg text-[10px] font-black uppercase hover:bg-red-700 shadow-md">PDF</button>
+                        <button onclick="exportAdminData('excel')" class="bg-green-600 text-white px-3 py-2 rounded-lg text-[10px] font-black uppercase hover:bg-green-700 shadow-md">Excel</button>
+                        <button onclick="togglePrintMode(false)" class="bg-gray-200 text-gray-600 px-3 py-2 rounded-lg text-[10px] font-black uppercase hover:bg-gray-300">Batal</button>
+                    </div>
+
                     <div class="relative">
                         <button onclick="toggleProfileMenu()" id="profile-btn" class="flex items-center pl-4 border-l border-gray-200 text-right group focus:outline-none">
                             <div class="mr-3 hidden md:block text-right">
@@ -100,16 +108,10 @@
                                 <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Hak Akses Admin</p>
                                 <p id="drop-admin-wilayah" class="text-xs font-black text-gray-800 truncate">Wilayah</p>
                             </div>
-                            <button onclick="gantiProfil()" class="w-full text-right px-4 py-2 text-xs text-gray-600 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-end transition">
-                                Ganti Foto Profil <span class="ml-2">🖼️</span>
-                            </button>
-                            <button onclick="formGantiPassword()" class="w-full text-right px-4 py-2 text-xs text-gray-600 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-end transition">
-                                Ganti Password <span class="ml-2">🔑</span>
-                            </button>
+                            <button onclick="gantiProfil()" class="w-full text-right px-4 py-2 text-xs text-gray-600 hover:bg-blue-50 flex items-center justify-end transition">Ganti Foto Profil 🖼️</button>
+                            <button onclick="formGantiPassword()" class="w-full text-right px-4 py-2 text-xs text-gray-600 hover:bg-blue-50 flex items-center justify-end transition">Ganti Password 🔑</button>
                             <hr class="my-1 border-gray-50">
-                            <button onclick="logout()" class="w-full text-right px-4 py-2 text-xs text-red-500 hover:bg-red-50 flex items-center justify-end transition font-bold uppercase tracking-widest">
-                                Keluar Sistem <span class="ml-2">🚀</span>
-                            </button>
+                            <button onclick="logout()" class="w-full text-right px-4 py-2 text-xs text-red-500 hover:bg-red-50 flex items-center justify-end transition font-bold uppercase tracking-widest">Keluar Sistem 🚀</button>
                         </div>
                     </div>
                 </div>
@@ -117,33 +119,25 @@
 
             <div class="p-8 relative z-10">
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-                    <div onclick="filterByStatus('all')" class="admin-stat-card border-l-4 border-l-blue-500">
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total Masuk</p>
-                        <h3 id="stat-wilayah-total" class="text-2xl font-black text-gray-800">0</h3>
-                    </div>
-                    <div onclick="filterByStatus('pending')" class="admin-stat-card border-l-4 border-l-yellow-500">
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Belum Dijawab</p>
-                        <h3 id="stat-wilayah-pending" class="text-2xl font-black text-yellow-600">0</h3>
-                    </div>
-                    <div onclick="filterByStatus('proses')" class="admin-stat-card border-l-4 border-l-blue-400">
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Proses TL</p>
-                        <h3 id="stat-wilayah-proses" class="text-2xl font-black text-blue-500">0</h3>
-                    </div>
-                    <div onclick="filterByStatus('verif')" class="admin-stat-card border-l-4 border-l-orange-500">
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Verifikasi TL</p>
-                        <h3 id="stat-wilayah-verif" class="text-2xl font-black text-orange-600">0</h3>
-                    </div>
-                    <div onclick="filterByStatus('tuntas')" class="admin-stat-card border-l-4 border-l-teal-500">
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Tuntas</p>
-                        <h3 id="stat-wilayah-done" class="text-2xl font-black text-teal-600">0</h3>
-                    </div>
+                    <div onclick="filterByStatus('all')" class="admin-stat-card border-l-4 border-l-blue-500"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total Masuk</p><h3 id="stat-wilayah-total" class="text-2xl font-black text-gray-800">0</h3></div>
+                    <div onclick="filterByStatus('pending')" class="admin-stat-card border-l-4 border-l-yellow-500"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Belum Dijawab</p><h3 id="stat-wilayah-pending" class="text-2xl font-black text-yellow-600">0</h3></div>
+                    <div onclick="filterByStatus('proses')" class="admin-stat-card border-l-4 border-l-blue-400"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Proses TL</p><h3 id="stat-wilayah-proses" class="text-2xl font-black text-blue-500">0</h3></div>
+                    <div onclick="filterByStatus('verif')" class="admin-stat-card border-l-4 border-l-orange-500"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Verifikasi TL</p><h3 id="stat-wilayah-verif" class="text-2xl font-black text-orange-600">0</h3></div>
+                    <div onclick="filterByStatus('tuntas')" class="admin-stat-card border-l-4 border-l-teal-500"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Tuntas</p><h3 id="stat-wilayah-done" class="text-2xl font-black text-teal-600">0</h3></div>
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div id="selected-count-bar" class="hidden p-3 bg-blue-50 border-b border-blue-100 flex justify-between items-center px-6">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase italic" id="selected-count-admin">0 Data Terpilih</span>
+                        <span class="text-[9px] text-gray-400 font-medium">Mode Cetak Aktif: Silakan centang data rekap</span>
+                    </div>
                     <div class="overflow-x-auto custom-scrollbar">
                         <table class="w-full text-left min-w-[1000px]">
                             <thead class="bg-gray-50 border-b border-gray-100">
                                 <tr class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                    <th id="col-check-h" class="hidden p-5 text-center" style="width: 50px">
+                                        <input type="checkbox" id="selectAllAdmin" onclick="toggleAllCheckboxesAdmin()" class="w-4 h-4 cursor-pointer">
+                                    </th>
                                     <th class="p-5">Waktu & No. Reg</th>
                                     <th class="p-5">Instansi & Detail Masalah</th>
                                     <th class="p-5 text-center">Status</th>
@@ -167,7 +161,6 @@
         let rawData = [];
         let filteredData = [];
 
-        // --- INISIALISASI ---
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true' || sessionStorage.getItem('userRole') !== 'admin') {
                 window.location.href = 'login.html';
@@ -175,120 +168,88 @@
                 document.body.style.display = "block";
                 const wilayah = (sessionStorage.getItem('wilayah') || 'semua').trim();
                 const nama = sessionStorage.getItem('namaOpd');
-                
                 document.getElementById('admin-wilayah-label').innerText = wilayah.toLowerCase() === 'semua' ? 'Super Admin' : wilayah;
                 document.getElementById('admin-name-display').innerText = nama;
                 document.getElementById('drop-admin-wilayah').innerText = wilayah;
                 document.getElementById('admin-role-display').innerText = wilayah.toLowerCase() === 'semua' ? 'Inspektur / Sekretaris' : 'Auditor Irban';
-                
                 fetchAdmin();
                 fetchProfilTerbaru();
             }
         })();
 
-        // --- FUNGSI DROPDOWN & PROFIL ---
-        function toggleProfileMenu() {
-            const menu = document.getElementById('profile-menu');
-            menu.classList.toggle('menu-hidden');
-            menu.classList.toggle('menu-visible');
-        }
+        // --- FUNGSI PRINT MODE ADMIN ---
+        function togglePrintMode(isPrinting) {
+            const btnStart = document.getElementById('btn-start-print');
+            const printOptions = document.getElementById('print-options');
+            const colCheckH = document.getElementById('col-check-h');
+            const colCheckD = document.querySelectorAll('.col-check-d');
+            const countBar = document.getElementById('selected-count-bar');
 
-        async function logout() {
-            const result = await Swal.fire({
-                title: 'Konfirmasi Keluar',
-                text: "Anda akan keluar dari Panel Admin.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#1F2937',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Keluar',
-                customClass: { popup: 'rounded-3xl' }
-            });
-            if (result.isConfirmed) { sessionStorage.clear(); window.location.href = 'login.html'; }
-        }
-
-        async function fetchProfilTerbaru() {
-            const user = sessionStorage.getItem('userName');
-            try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${user}&select=foto_profil`, { headers: headers });
-                const data = await res.json();
-                if (data.length > 0 && data[0].foto_profil) {
-                    let finalUrl = data[0].foto_profil;
-                    if (finalUrl.includes('drive.google.com')) {
-                        let fileId = finalUrl.split('/d/')[1]?.split('/')[0] || finalUrl.split('id=')[1];
-                        if(fileId) finalUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
-                    }
-                    document.getElementById('head-avatar').src = finalUrl + '?t=' + Date.now();
-                }
-            } catch (error) { console.error("Gagal load profil admin."); }
-        }
-
-        async function gantiProfil() {
-            toggleProfileMenu();
-            const { value: file } = await Swal.fire({
-                title: 'Ganti Foto Profil Irban',
-                input: 'file',
-                inputAttributes: { 'accept': 'image/*', 'aria-label': 'Pilih foto' },
-                showCancelButton: true, confirmButtonText: 'Upload', confirmButtonColor: '#3b82f6',
-                customClass: { popup: 'rounded-3xl' }
-            });
-
-            if (file) {
-                Swal.fire({ title: 'Mengunggah...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = async () => {
-                    const base64Data = reader.result.split(",")[1];
-                    try {
-                        const uploadRes = await fetch(APPS_SCRIPT_URL, {
-                            method: 'POST',
-                            body: JSON.stringify({ action: "upload_only", fileData: base64Data, fileName: `PROFIL_ADMIN_${sessionStorage.getItem('userName')}`, fileType: file.type })
-                        });
-                        const uploadResult = await uploadRes.json();
-                        if (uploadResult.status === "success") {
-                            await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${sessionStorage.getItem('userName')}`, {
-                                method: 'PATCH',
-                                headers: { ...headers, "Content-Type": "application/json" },
-                                body: JSON.stringify({ foto_profil: uploadResult.fileLink })
-                            });
-                            Swal.fire({ icon: 'success', title: 'Profil Terupdate!', timer: 1500, showConfirmButton: false });
-                            setTimeout(fetchProfilTerbaru, 1000);
-                        }
-                    } catch (err) { Swal.fire('Error', 'Gagal update profil.', 'error'); }
-                };
+            if (isPrinting) {
+                btnStart.classList.add('hidden');
+                printOptions.classList.remove('hidden');
+                colCheckH.classList.remove('hidden');
+                colCheckD.forEach(el => el.classList.remove('hidden'));
+                countBar.classList.remove('hidden');
+            } else {
+                btnStart.classList.remove('hidden');
+                printOptions.classList.add('hidden');
+                colCheckH.classList.add('hidden');
+                colCheckD.forEach(el => el.classList.add('hidden'));
+                countBar.classList.add('hidden');
+                document.getElementById('selectAllAdmin').checked = false;
+                document.querySelectorAll('.admin-data-check').forEach(cb => cb.checked = false);
+                updateSelectedCountAdmin();
             }
         }
 
-        async function formGantiPassword() {
-            toggleProfileMenu();
-            const { value: pass } = await Swal.fire({
-                title: 'Ganti Password Admin',
-                html: `<input id="p1" type="password" class="swal2-input" placeholder="Password Baru">
-                       <input id="p2" type="password" class="swal2-input" placeholder="Konfirmasi">`,
-                preConfirm: () => {
-                    const p1 = document.getElementById('p1').value;
-                    const p2 = document.getElementById('p2').value;
-                    if (p1.length < 6) return Swal.showValidationMessage('Min 6 karakter!');
-                    if (p1 !== p2) return Swal.showValidationMessage('Tidak cocok!');
-                    return p1;
-                },
-                showCancelButton: true, confirmButtonColor: '#1F2937',
-                customClass: { popup: 'rounded-3xl' }
-            });
-
-            if (pass) {
-                try {
-                    await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${sessionStorage.getItem('userName')}`, {
-                        method: 'PATCH',
-                        headers: { ...headers, "Content-Type": "application/json" },
-                        body: JSON.stringify({ password: pass })
-                    });
-                    Swal.fire({ icon: 'success', title: 'Password Terupdate!', timer: 1500, showConfirmButton: false });
-                } catch (error) { Swal.fire('Error', 'Gagal ganti password.', 'error'); }
-            }
+        function toggleAllCheckboxesAdmin() {
+            const isChecked = document.getElementById('selectAllAdmin').checked;
+            document.querySelectorAll('.admin-data-check').forEach(cb => cb.checked = isChecked);
+            updateSelectedCountAdmin();
         }
 
-        // --- FUNGSI CORE ADMIN ---
+        function updateSelectedCountAdmin() {
+            const count = document.querySelectorAll('.admin-data-check:checked').length;
+            document.getElementById('selected-count-admin').innerText = `${count} Data Terpilih`;
+        }
+
+        async function exportAdminData(type) {
+            const selectedIds = Array.from(document.querySelectorAll('.admin-data-check:checked')).map(cb => cb.value);
+            const dataToExport = rawData.filter(item => selectedIds.includes(item.id.toString()));
+
+            if (dataToExport.length === 0) return Swal.fire('Peringatan', 'Pilih minimal satu data rekap!', 'warning');
+
+            if (type === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('l', 'mm', 'a4');
+                const wilayah = sessionStorage.getItem('wilayah') || 'Kabupaten Malang';
+                doc.setFontSize(14);
+                doc.text(`REKAP MONITORING KONSULTASI - ${wilayah.toUpperCase()}`, 14, 15);
+                doc.setFontSize(9);
+                doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')}`, 14, 21);
+                
+                const tableBody = dataToExport.map(i => [
+                    generateRegNum(i.id, i.waktu_pengajuan), i.instansi, i.judul_masalah, i.kategori, i.status_tl
+                ]);
+                
+                doc.autoTable({ 
+                    head: [['No. Reg', 'Instansi', 'Judul Masalah', 'Kategori', 'Status']], 
+                    body: tableBody, startY: 25, theme: 'striped', headStyles: { fillColor: [31, 41, 55] }, styles: { fontSize: 7 } 
+                });
+                doc.save(`Rekap_PamanSigit_${wilayah.replace(/\s+/g,'_')}.pdf`);
+            } else {
+                const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap_Admin");
+                XLSX.utils.writeFile(workbook, `Rekap_Admin_PamanSigit.xlsx`);
+            }
+
+            Swal.fire('Berhasil', `Data Rekap berhasil diunduh.`, 'success');
+            togglePrintMode(false);
+        }
+
+        // --- CORE ADMIN FUNCTIONS ---
         function generateRegNum(id, waktuAju) {
             const date = new Date(waktuAju);
             const tgl = ("0" + date.getDate()).slice(-2);
@@ -301,10 +262,8 @@
             const loader = document.getElementById('loader');
             const myWilayah = (sessionStorage.getItem('wilayah') || 'semua').trim().toLowerCase();
             loader.classList.remove('hidden');
-            
             let queryUrl = `${SUPABASE_URL}/rest/v1/konsultasi?select=*&order=waktu_pengajuan.desc`;
             if (myWilayah !== 'semua') { queryUrl += `&wilayah_opd=eq.${sessionStorage.getItem('wilayah')}`; }
-            
             try {
                 const res = await fetch(queryUrl, { headers: headers });
                 rawData = await res.json();
@@ -315,18 +274,10 @@
             } catch (e) { loader.innerHTML = `<span class="text-red-500 font-bold">⚠️ Database Error.</span>`; }
         }
 
-        function updateAdminStats(data) {
-            document.getElementById('stat-wilayah-total').innerText = data.length;
-            document.getElementById('stat-wilayah-pending').innerText = data.filter(item => !item.jawaban).length;
-            document.getElementById('stat-wilayah-proses').innerText = data.filter(item => item.jawaban && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length;
-            document.getElementById('stat-wilayah-verif').innerText = data.filter(item => item.status_tl === "Menunggu Verifikasi").length;
-            document.getElementById('stat-wilayah-done').innerText = data.filter(item => item.status_tl === "Tuntas").length;
-        }
-
         function renderTable(data) {
             const body = document.getElementById('adminBody');
             if (!data || data.length === 0) {
-                body.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-gray-400 italic text-[10px] tracking-widest">Tidak ada data.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-gray-400 italic text-[10px] tracking-widest">Tidak ada data.</td></tr>`;
                 return;
             }
             body.innerHTML = data.map(item => {
@@ -336,17 +287,11 @@
                 const verif = item.status_tl === "Menunggu Verifikasi";
                 const tuntas = item.status_tl === "Tuntas";
                 const perbaikan = item.status_tl === "Perlu Perbaikan";
-                
                 const badge = tuntas ? "bg-teal-100 text-teal-700 border-teal-200" : (verif ? "bg-orange-100 text-orange-700 border-orange-200" : (terjawab ? "bg-green-100 text-green-700 border-green-200" : "bg-yellow-100 text-yellow-700 border-yellow-200"));
                 const txt = tuntas ? "Tuntas" : (verif ? "Verifikasi" : (terjawab ? "Terjawab" : "Menunggu"));
 
-                let previewBukti = "";
-                if(item.bukti_tl && item.bukti_tl.includes('drive.google.com')){
-                    const link = item.bukti_tl.split('Link Dokumen: ')[1]?.split(' ')[0];
-                    if(link) previewBukti = `<div class="preview-container"><iframe src="${link.replace('/view', '/preview')}" class="preview-iframe"></iframe></div>`;
-                }
-
                 return `<tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
+                    <td class="col-check-d hidden p-5 text-center"><input type="checkbox" class="admin-data-check w-4 h-4 cursor-pointer" value="${id}" onclick="updateSelectedCountAdmin()"></td>
                     <td class="p-5 align-top w-48">
                         <div class="text-[11px] font-black text-blue-600 mb-1 tracking-tighter">${reg}</div>
                         <div class="text-[10px] text-gray-400 mb-1 italic">📅 ${new Date(item.waktu_pengajuan).toLocaleString('id-ID')}</div>
@@ -356,24 +301,31 @@
                         <div class="font-black text-gray-800 uppercase text-[11px] mb-1">${item.instansi}</div>
                         <div class="font-bold text-gray-700 mb-2 text-xs leading-tight">${item.judul_masalah}</div>
                         <div class="text-[11px] text-gray-500 bg-gray-50 p-3 rounded-xl border border-gray-100 italic mb-2">"${item.rincian_masalah}"</div>
-                        ${verif ? `<div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-xs mb-3">
-                            <span class="font-bold text-orange-700 uppercase text-[10px]">Bukti TL OPD:</span>
-                            <p class="mt-1 italic">"${item.bukti_tl.split('|')[0]}"</p>${previewBukti}</div>` : ""}
-                        ${(verif || !terjawab || perbaikan) ? `<textarea id="reply-${id}" class="w-full p-3 text-xs border rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none" rows="2" placeholder="Respon Auditor..."></textarea>` : 
-                        `<div class="text-[11px] text-blue-700 bg-blue-50 p-2 rounded-lg italic">Respon Terakhir: ${tuntas ? item.catatan_admin_tl : item.jawaban}</div>`}
+                        ${verif ? `<div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-xs mb-3 font-bold text-orange-700">Laporan TL OPD dikirim, silakan periksa.</div>` : ""}
+                        ${(verif || !terjawab || perbaikan) ? `<textarea id="reply-${id}" class="w-full p-3 text-xs border rounded-xl outline-none" rows="2" placeholder="Respon Auditor..."></textarea>` : 
+                        `<div class="text-[11px] text-blue-700 bg-blue-50 p-2 rounded-lg italic">Respon: ${tuntas ? item.catatan_admin_tl : item.jawaban}</div>`}
                     </td>
                     <td class="p-5 text-center align-top pt-8 w-32"><span class="inline-block w-24 py-1.5 text-[9px] font-black rounded-full border uppercase ${badge}">${txt}</span></td>
                     <td class="p-5 text-center align-top pt-6 w-40">
                         <div class="flex flex-col space-y-2">
-                            ${verif ? `<button onclick="handleVerifikasi(${id}, 'Tuntas')" class="bg-teal-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase shadow-sm">✅ Tuntas</button>
-                                       <button onclick="handleVerifikasi(${id}, 'Perlu Perbaikan')" class="bg-red-500 text-white py-2 rounded-lg text-[10px] font-bold uppercase shadow-sm">❌ Tolak</button>` : 
-                            (!terjawab || perbaikan ? `<button onclick="handleKirimJawaban(${id})" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase">Kirim Respon</button>` : 
-                            (tuntas ? `<span class="text-[10px] text-teal-600 font-bold italic">Selesai</span>` : `<button onclick="batalSelesai(${id})" class="text-[9px] text-gray-400 underline uppercase">Ubah Jawaban</button>`))}
+                            ${verif ? `<button onclick="handleVerifikasi(${id}, 'Tuntas')" class="bg-teal-600 text-white py-2 rounded-lg text-[10px] font-bold">✅ Tuntas</button>
+                                       <button onclick="handleVerifikasi(${id}, 'Perlu Perbaikan')" class="bg-red-500 text-white py-2 rounded-lg text-[10px] font-bold">❌ Tolak</button>` : 
+                            (!terjawab || perbaikan ? `<button onclick="handleKirimJawaban(${id})" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold">Kirim Respon</button>` : 
+                            (tuntas ? `<span class="text-[10px] text-teal-600 font-bold italic">Selesai</span>` : `<button onclick="batalSelesai(${id})" class="text-[9px] text-gray-400 underline">Ubah</button>`))}
                             <a href="https://wa.me/${item.nomor_hp}" target="_blank" class="bg-green-500 text-white py-2 rounded-lg text-[10px] font-bold uppercase text-center">WhatsApp</a>
                         </div>
                     </td>
                 </tr>`;
             }).join('');
+        }
+
+        // --- OTHER FUNCTIONS (STATS, FILTERS, ETC) ---
+        function updateAdminStats(data) {
+            document.getElementById('stat-wilayah-total').innerText = data.length;
+            document.getElementById('stat-wilayah-pending').innerText = data.filter(i => !i.jawaban).length;
+            document.getElementById('stat-wilayah-proses').innerText = data.filter(i => i.jawaban && (i.status_tl === "Belum TL" || i.status_tl === "Perlu Perbaikan")).length;
+            document.getElementById('stat-wilayah-verif').innerText = data.filter(i => i.status_tl === "Menunggu Verifikasi").length;
+            document.getElementById('stat-wilayah-done').innerText = data.filter(i => i.status_tl === "Tuntas").length;
         }
 
         function filterByStatus(s) {
@@ -391,20 +343,11 @@
             renderTable(filteredData);
         }
 
-        async function exportAdminPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'mm', 'a4');
-            doc.text(`REKAP MONITORING - ${sessionStorage.getItem('wilayah') || 'KAB MALANG'}`, 14, 15);
-            const body = filteredData.map(i => [generateRegNum(i.id, i.waktu_pengajuan), i.instansi, i.judul_masalah, i.status_tl]);
-            doc.autoTable({ head: [['No. Reg', 'Instansi', 'Judul', 'Status']], body: body, startY: 25, theme: 'striped' });
-            doc.save('Rekap_PamanSigit.pdf');
-        }
-
         async function handleVerifikasi(id, s) {
             const c = document.getElementById(`reply-${id}`).value;
-            if(!c.trim()) return Swal.fire('Error', 'Catatan verifikasi wajib diisi!', 'warning');
+            if(!c.trim()) return Swal.fire('Error', 'Isi catatan verifikasi!', 'warning');
             await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ status_tl: s, catatan_admin_tl: c }) });
-            Swal.fire({ icon: 'success', title: 'Update Berhasil!', timer: 1500, showConfirmButton: false });
+            Swal.fire({ icon: 'success', title: 'Berhasil!', timer: 1500, showConfirmButton: false });
             fetchAdmin();
         }
 
@@ -421,15 +364,22 @@
             if(isConfirmed) { await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ jawaban: null, waktu_jawaban: null, status_tl: "Belum TL" }) }); fetchAdmin(); }
         }
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
-        
-        window.addEventListener('click', function(e) {
-            const menu = document.getElementById('profile-menu');
-            const btn = document.getElementById('profile-btn');
-            if (menu && !menu.classList.contains('menu-hidden') && !btn.contains(e.target) && !menu.contains(e.target)) {
-                 menu.classList.add('menu-hidden'); menu.classList.remove('menu-visible');
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
+        async function logout() { const res = await Swal.fire({ title: 'Keluar?', icon: 'question', showCancelButton: true }); if(res.isConfirmed) { sessionStorage.clear(); window.location.href = 'login.html'; } }
+        function toggleProfileMenu() { const m = document.getElementById('profile-menu'); m.classList.toggle('menu-hidden'); m.classList.toggle('menu-visible'); }
+        async function fetchProfilTerbaru() {
+            const user = sessionStorage.getItem('userName');
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${user}&select=foto_profil`, { headers });
+            const data = await res.json();
+            if (data[0]?.foto_profil) {
+                let url = data[0].foto_profil;
+                if (url.includes('drive.google.com')) {
+                    const id = url.split('/d/')[1]?.split('/')[0] || url.split('id=')[1];
+                    url = `https://drive.google.com/uc?export=view&id=${id}`;
+                }
+                document.getElementById('head-avatar').src = url + '?t=' + Date.now();
             }
-        });
+        }
     </script>
 </body>
 </html>
