@@ -19,15 +19,13 @@
         .spin { animation: rotate 0.8s linear; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* Solid Color Class */
         .bg-paman-dark { background-color: #1F2937; }
 
         .watermark-fixed {
             position: fixed; bottom: -30px; right: -30px; width: 500px; height: 500px;
             background-image: url('../pages/inspektorat.png');
             background-size: contain; background-repeat: no-repeat; background-position: center;
-            opacity: 0.5; /* KEMBALI KE 0.5 SESUAI PERMINTAAN */
-            z-index: 0; pointer-events: none;
+            opacity: 0.5; z-index: 0; pointer-events: none;
         }
 
         .text-watermark {
@@ -36,7 +34,6 @@
             pointer-events: none; user-select: none; text-transform: uppercase;
         }
 
-        /* Dropdown Animation */
         #profile-menu { transform-origin: top right; transition: all 0.2s ease-out; }
         .menu-hidden { transform: scale(0.95); opacity: 0; pointer-events: none; }
         .menu-visible { transform: scale(1); opacity: 1; pointer-events: auto; }
@@ -98,13 +95,13 @@
                     </button>
 
                     <div class="relative">
-                        <button onclick="toggleProfileMenu()" class="flex items-center pl-4 border-l border-gray-200 text-right group focus:outline-none">
-                            <div class="mr-3 hidden md:block">
+                        <button onclick="toggleProfileMenu()" id="profile-btn" class="flex items-center pl-4 border-l border-gray-200 text-right group focus:outline-none">
+                            <div class="mr-3 hidden md:block text-right">
                                 <p id="head-opd-name" class="text-[10px] font-black text-gray-800 uppercase leading-none mb-1">NAMA OPD</p>
                                 <p id="head-username" class="text-[9px] text-blue-600 font-bold">@username</p>
                             </div>
                             <div class="w-10 h-10 bg-blue-600 rounded-xl profile-ring shadow-lg ring-2 ring-blue-50 ring-offset-2 overflow-hidden transition group-hover:scale-105">
-                                <img id="head-avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full object-cover user-avatar-img">
+                                <img id="head-avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full object-cover">
                             </div>
                         </button>
 
@@ -186,7 +183,6 @@
     <script>
         const SUPABASE_URL = "https://afaiwyfodjllolzwbhmz.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_0Jj5RTBAL3gewJvwOsvAxA_aPu370Bl";
-        // Masukkan URL Apps Script kamu di sini untuk fitur ganti profil
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2l5RHPGfRBDGt4SJUyKycyAfvKBjHl7F9Prr6Oq82AMoGUAKLRticQPf55sKy-AZr/exec";
         const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` };
         
@@ -202,23 +198,19 @@
                 const role = sessionStorage.getItem('userRole');
                 if(role === 'admin') document.getElementById('admin-link').classList.remove('hidden');
                 
-                // Set data di Header & Dropdown
                 document.getElementById('head-opd-name').innerText = name;
                 document.getElementById('drop-nama-opd').innerText = name;
                 document.getElementById('head-username').innerText = '@' + user;
                 document.getElementById('head-avatar').src = `https://ui-avatars.com/api/?name=${name.replace(/\s+/g, '+')}&background=0D8ABC&color=fff`;
-
-                // Set data di Sambutan
                 document.getElementById('welcome-opd').innerText = name;
                 document.getElementById('current-year-label').innerText = new Date().getFullYear();
                 
                 startClock();
                 initChart();
-                fetchProfilTerbaru(); // Ambil foto profil kustom jika ada
+                fetchProfilTerbaru();
             }
         })();
 
-        // --- FUNGSI DROP DOWN & FITUR PENGGUNA (GANTI FOTO & PASSWORD) ---
         function toggleProfileMenu() {
             const menu = document.getElementById('profile-menu');
             menu.classList.toggle('menu-hidden');
@@ -231,14 +223,19 @@
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${user}&select=foto_profil`, { headers: headers });
                 const data = await res.json();
                 if (data.length > 0 && data[0].foto_profil) {
-                    // Update foto di header
-                    document.getElementById('head-avatar').src = data[0].foto_profil;
+                    let finalUrl = data[0].foto_profil;
+                    // FIX: Konversi link Google Drive ke Direct Link
+                    if (finalUrl.includes('drive.google.com')) {
+                        const fileId = finalUrl.split('/d/')[1]?.split('/')[0] || finalUrl.split('id=')[1];
+                        if(fileId) finalUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                    }
+                    document.getElementById('head-avatar').src = finalUrl;
                 }
-            } catch (error) { console.error("Gagal memuat foto profil kustom."); }
+            } catch (error) { console.error("Gagal memuat foto profil."); }
         }
 
         async function gantiProfil() {
-            toggleProfileMenu(); // Tutup dropdown
+            toggleProfileMenu();
             const { value: file } = await Swal.fire({
                 title: 'Ganti Foto Profil',
                 input: 'file',
@@ -249,37 +246,33 @@
 
             if (file) {
                 if(file.size > 2 * 1024 * 1024) return Swal.fire('Error', 'Ukuran file maksimal 2MB', 'error');
-
                 Swal.fire({ title: 'Mengunggah...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async () => {
                     const base64Data = reader.result.split(",")[1];
                     try {
-                        // 1. Upload ke Drive via Apps Script
                         const uploadRes = await fetch(APPS_SCRIPT_URL, {
                             method: 'POST',
                             body: JSON.stringify({ action: "upload_only", fileData: base64Data, fileName: `PROFIL_${sessionStorage.getItem('userName')}`, fileType: file.type })
                         });
                         const uploadResult = await uploadRes.json();
-                        
                         if (uploadResult.status === "success") {
-                            // 2. Update link di Supabase
                             await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${sessionStorage.getItem('userName')}`, {
                                 method: 'PATCH',
                                 headers: { ...headers, "Content-Type": "application/json" },
                                 body: JSON.stringify({ foto_profil: uploadResult.fileLink })
                             });
                             Swal.fire({ icon: 'success', title: 'Foto Profil Diperbarui!', timer: 1500, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
-                            fetchProfilTerbaru(); // Refresh foto di header
-                        } else { throw new Error("Gagal upload ke Drive"); }
+                            fetchProfilTerbaru();
+                        } else { throw new Error(); }
                     } catch (err) { Swal.fire('Error', 'Gagal memperbarui profil.', 'error'); }
                 };
             }
         }
 
         async function formGantiPassword() {
-            toggleProfileMenu(); // Tutup dropdown
+            toggleProfileMenu();
             const { value: pass } = await Swal.fire({
                 title: 'Ganti Password',
                 html: `<input id="p1" type="password" class="swal2-input" placeholder="Password Baru">
@@ -308,7 +301,6 @@
             }
         }
 
-        // --- FUNGSI SISTEM (CLOCK, CHART, REFRESH) ---
         function startClock() {
             setInterval(() => {
                 const now = new Date();
@@ -347,7 +339,6 @@
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?select=status_tl,jawaban,waktu_pengajuan`, { headers: headers });
                 const data = await response.json();
-                
                 document.getElementById('stat-total').innerText = data.length;
                 document.getElementById('stat-pending').innerText = data.filter(item => !item.jawaban).length;
                 document.getElementById('stat-proses-tl').innerText = data.filter(item => item.jawaban && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length;
@@ -362,7 +353,6 @@
                 });
                 myChart.data.datasets[0].data = monthlyData;
                 myChart.update();
-
                 document.getElementById('ping-tl').classList.toggle('hidden', v === 0);
             } catch (error) { console.error(error); }
         }
@@ -370,11 +360,11 @@
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
         function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
 
-        // Close dropdown when clicking outside
+        // CLOSE DROPDOWN LOGIC FIXED
         window.addEventListener('click', function(e) {
             const menu = document.getElementById('profile-menu');
-            const btn = document.querySelector('header border-l'); // Area tombol profil di header
-            if (menu && !menu.classList.contains('menu-hidden') && !e.target.closest('header')) {
+            const btn = document.getElementById('profile-btn');
+            if (menu && !menu.classList.contains('menu-hidden') && !btn.contains(e.target) && !menu.contains(e.target)) {
                  menu.classList.add('menu-hidden');
                  menu.classList.remove('menu-visible');
             }
