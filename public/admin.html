@@ -6,36 +6,35 @@
     <title>Admin Panel | PAMAN SIGIT Inspektorat Kabupaten Malang</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="../pages/logo_kab.png">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
     <style>
         body { user-select: none; -webkit-user-select: none; display: none; }
         .custom-scrollbar::-webkit-scrollbar { height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .profile-ring { padding: 2px; background: linear-gradient(to bottom right, #3b82f6, #1e40af); }
-        .admin-stat-card { @apply bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col transition-all hover:shadow-md cursor-pointer; }
+        .admin-stat-card { @apply bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col transition-all hover:shadow-md cursor-pointer hover:-translate-y-1; }
         .preview-container { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; margin-top: 0.75rem; background: #f9fafb; }
         .preview-iframe { width: 100%; height: 100%; border: none; }
+        
+        .bg-paman-dark { background-color: #1F2937; }
 
         .watermark-fixed {
-            position: fixed;
-            bottom: -30px;
-            right: -30px;
-            width: 500px;
-            height: 500px;
+            position: fixed; bottom: -30px; right: -30px; width: 500px; height: 500px;
             background-image: url('../pages/inspektorat.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.5;
-            z-index: 0;
-            pointer-events: none;
-            transform: none;
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            opacity: 0.5; z-index: 0; pointer-events: none;
         }
+
+        /* Dropdown Animation */
+        #profile-menu { transform-origin: top right; transition: all 0.2s ease-out; }
+        .menu-hidden { transform: scale(0.95); opacity: 0; pointer-events: none; }
+        .menu-visible { transform: scale(1); opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 overflow-hidden">
@@ -43,7 +42,7 @@
     <div class="watermark-fixed"></div>
 
     <div class="flex h-screen overflow-hidden relative z-10">
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1F2937] text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-paman-dark text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl md:shadow-none">
             <div class="p-6 border-b border-gray-700 flex flex-col items-center">
                 <img src="../pages/logo_kab.png" alt="Logo" class="w-14 mb-3 drop-shadow-md">
                 <div class="text-center">
@@ -55,9 +54,10 @@
                 <div class="bg-blue-600/10 text-blue-400 p-3 rounded-lg text-sm font-bold border-l-4 border-blue-500">🛡️ Kelola Konsultasi</div>
                 <a href="index.html" class="block p-3 text-gray-400 hover:text-white text-[10px] uppercase font-bold tracking-tighter transition">← Dashboard User</a>
             </nav>
-            <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50">
-                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700 flex items-center justify-center">
-                    <img src="../pages/zoga.jpg" alt="Zoga" class="w-full h-full object-cover rounded-full">
+
+            <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50 relative">
+                <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700">
+                    <img src="../pages/zoga.jpg" alt="Zoga" onerror="this.src='https://ui-avatars.com/api/?name=Ananda+Zoga'" class="w-full h-full object-cover">
                 </div>
                 <div class="text-center">
                     <p class="text-[9px] text-blue-400 uppercase font-black tracking-tighter mb-1">Pengembang Sistem</p>
@@ -80,31 +80,60 @@
                         <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari Nama OPD, No Reg, atau Masalah..." class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl bg-gray-50 text-xs focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
                 </div>
-                <div class="flex items-center space-x-3 text-right">
-                    <button onclick="exportAdminPDF()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold hover:bg-red-700 uppercase shadow-md transition active:scale-95">📄 Cetak Rekap</button>
-                    <button onclick="fetchAdmin()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold hover:bg-blue-700 uppercase shadow-md transition active:scale-95">🔄 Refresh</button>
+
+                <div class="flex items-center space-x-4">
+                    <button onclick="exportAdminPDF()" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-[10px] font-bold border border-red-100 hover:bg-red-100 uppercase shadow-sm transition active:scale-95">📄 Cetak Rekap</button>
+                    
+                    <div class="relative">
+                        <button onclick="toggleProfileMenu()" id="profile-btn" class="flex items-center pl-4 border-l border-gray-200 text-right group focus:outline-none">
+                            <div class="mr-3 hidden md:block text-right">
+                                <p id="admin-name-display" class="text-[10px] font-black text-gray-800 uppercase leading-none mb-1">AUDITOR</p>
+                                <p id="admin-role-display" class="text-[9px] text-blue-600 font-bold tracking-tight italic">Inspektorat</p>
+                            </div>
+                            <div class="w-10 h-10 bg-gray-200 rounded-xl profile-ring shadow-lg ring-2 ring-blue-50 ring-offset-2 overflow-hidden transition group-hover:scale-105">
+                                <img id="head-avatar" src="https://ui-avatars.com/api/?name=Admin" class="w-full h-full object-cover">
+                            </div>
+                        </button>
+
+                        <div id="profile-menu" class="menu-hidden absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50">
+                            <div class="px-4 py-3 border-b border-gray-50 text-right">
+                                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Hak Akses Admin</p>
+                                <p id="drop-admin-wilayah" class="text-xs font-black text-gray-800 truncate">Wilayah</p>
+                            </div>
+                            <button onclick="gantiProfil()" class="w-full text-right px-4 py-2 text-xs text-gray-600 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-end transition">
+                                Ganti Foto Profil <span class="ml-2">🖼️</span>
+                            </button>
+                            <button onclick="formGantiPassword()" class="w-full text-right px-4 py-2 text-xs text-gray-600 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-end transition">
+                                Ganti Password <span class="ml-2">🔑</span>
+                            </button>
+                            <hr class="my-1 border-gray-50">
+                            <button onclick="logout()" class="w-full text-right px-4 py-2 text-xs text-red-500 hover:bg-red-50 flex items-center justify-end transition font-bold uppercase tracking-widest">
+                                Keluar Sistem <span class="ml-2">🚀</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </header>
 
             <div class="p-8 relative z-10">
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-                    <div onclick="filterByStatus('all')" class="admin-stat-card border-l-4 border-l-blue-500 shadow-blue-100">
+                    <div onclick="filterByStatus('all')" class="admin-stat-card border-l-4 border-l-blue-500">
                         <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total Masuk</p>
                         <h3 id="stat-wilayah-total" class="text-2xl font-black text-gray-800">0</h3>
                     </div>
-                    <div onclick="filterByStatus('pending')" class="admin-stat-card border-l-4 border-l-yellow-500 shadow-yellow-100">
+                    <div onclick="filterByStatus('pending')" class="admin-stat-card border-l-4 border-l-yellow-500">
                         <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Belum Dijawab</p>
                         <h3 id="stat-wilayah-pending" class="text-2xl font-black text-yellow-600">0</h3>
                     </div>
-                    <div onclick="filterByStatus('proses')" class="admin-stat-card border-l-4 border-l-blue-400 shadow-blue-50">
+                    <div onclick="filterByStatus('proses')" class="admin-stat-card border-l-4 border-l-blue-400">
                         <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Proses TL</p>
                         <h3 id="stat-wilayah-proses" class="text-2xl font-black text-blue-500">0</h3>
                     </div>
-                    <div onclick="filterByStatus('verif')" class="admin-stat-card border-l-4 border-l-orange-500 shadow-orange-100">
+                    <div onclick="filterByStatus('verif')" class="admin-stat-card border-l-4 border-l-orange-500">
                         <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Verifikasi TL</p>
                         <h3 id="stat-wilayah-verif" class="text-2xl font-black text-orange-600">0</h3>
                     </div>
-                    <div onclick="filterByStatus('tuntas')" class="admin-stat-card border-l-4 border-l-teal-500 shadow-teal-100">
+                    <div onclick="filterByStatus('tuntas')" class="admin-stat-card border-l-4 border-l-teal-500">
                         <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Tuntas</p>
                         <h3 id="stat-wilayah-done" class="text-2xl font-black text-teal-600">0</h3>
                     </div>
@@ -124,7 +153,7 @@
                             <tbody id="adminBody" class="divide-y divide-gray-50 text-sm"></tbody>
                         </table>
                     </div>
-                    <div id="loader" class="p-10 text-center text-gray-400 italic text-xs uppercase animate-pulse">Menghubungkan ke Supabase...</div>
+                    <div id="loader" class="p-10 text-center text-gray-400 italic text-[10px] uppercase animate-pulse">Menghubungkan ke Database Inspektorat...</div>
                 </div>
             </div>
         </main>
@@ -133,10 +162,12 @@
     <script>
         const SUPABASE_URL = "https://afaiwyfodjllolzwbhmz.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_0Jj5RTBAL3gewJvwOsvAxA_aPu370Bl"; 
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2l5RHPGfRBDGt4SJUyKycyAfvKBjHl7F9Prr6Oq82AMoGUAKLRticQPf55sKy-AZr/exec";
         const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
         let rawData = [];
         let filteredData = [];
 
+        // --- INISIALISASI ---
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true' || sessionStorage.getItem('userRole') !== 'admin') {
                 window.location.href = 'login.html';
@@ -144,29 +175,136 @@
                 document.body.style.display = "block";
                 const wilayah = (sessionStorage.getItem('wilayah') || 'semua').trim();
                 const nama = sessionStorage.getItem('namaOpd');
+                
                 document.getElementById('admin-wilayah-label').innerText = wilayah.toLowerCase() === 'semua' ? 'Super Admin' : wilayah;
                 document.getElementById('admin-name-display').innerText = nama;
+                document.getElementById('drop-admin-wilayah').innerText = wilayah;
                 document.getElementById('admin-role-display').innerText = wilayah.toLowerCase() === 'semua' ? 'Inspektur / Sekretaris' : 'Auditor Irban';
+                
+                fetchAdmin();
+                fetchProfilTerbaru();
             }
         })();
 
-        // FUNGSI PENOMORAN REGISTRASI (SINKRON)
+        // --- FUNGSI DROPDOWN & PROFIL ---
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profile-menu');
+            menu.classList.toggle('menu-hidden');
+            menu.classList.toggle('menu-visible');
+        }
+
+        async function logout() {
+            const result = await Swal.fire({
+                title: 'Konfirmasi Keluar',
+                text: "Anda akan keluar dari Panel Admin.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#1F2937',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Keluar',
+                customClass: { popup: 'rounded-3xl' }
+            });
+            if (result.isConfirmed) { sessionStorage.clear(); window.location.href = 'login.html'; }
+        }
+
+        async function fetchProfilTerbaru() {
+            const user = sessionStorage.getItem('userName');
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${user}&select=foto_profil`, { headers: headers });
+                const data = await res.json();
+                if (data.length > 0 && data[0].foto_profil) {
+                    let finalUrl = data[0].foto_profil;
+                    if (finalUrl.includes('drive.google.com')) {
+                        let fileId = finalUrl.split('/d/')[1]?.split('/')[0] || finalUrl.split('id=')[1];
+                        if(fileId) finalUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                    }
+                    document.getElementById('head-avatar').src = finalUrl + '?t=' + Date.now();
+                }
+            } catch (error) { console.error("Gagal load profil admin."); }
+        }
+
+        async function gantiProfil() {
+            toggleProfileMenu();
+            const { value: file } = await Swal.fire({
+                title: 'Ganti Foto Profil Irban',
+                input: 'file',
+                inputAttributes: { 'accept': 'image/*', 'aria-label': 'Pilih foto' },
+                showCancelButton: true, confirmButtonText: 'Upload', confirmButtonColor: '#3b82f6',
+                customClass: { popup: 'rounded-3xl' }
+            });
+
+            if (file) {
+                Swal.fire({ title: 'Mengunggah...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    const base64Data = reader.result.split(",")[1];
+                    try {
+                        const uploadRes = await fetch(APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({ action: "upload_only", fileData: base64Data, fileName: `PROFIL_ADMIN_${sessionStorage.getItem('userName')}`, fileType: file.type })
+                        });
+                        const uploadResult = await uploadRes.json();
+                        if (uploadResult.status === "success") {
+                            await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${sessionStorage.getItem('userName')}`, {
+                                method: 'PATCH',
+                                headers: { ...headers, "Content-Type": "application/json" },
+                                body: JSON.stringify({ foto_profil: uploadResult.fileLink })
+                            });
+                            Swal.fire({ icon: 'success', title: 'Profil Terupdate!', timer: 1500, showConfirmButton: false });
+                            setTimeout(fetchProfilTerbaru, 1000);
+                        }
+                    } catch (err) { Swal.fire('Error', 'Gagal update profil.', 'error'); }
+                };
+            }
+        }
+
+        async function formGantiPassword() {
+            toggleProfileMenu();
+            const { value: pass } = await Swal.fire({
+                title: 'Ganti Password Admin',
+                html: `<input id="p1" type="password" class="swal2-input" placeholder="Password Baru">
+                       <input id="p2" type="password" class="swal2-input" placeholder="Konfirmasi">`,
+                preConfirm: () => {
+                    const p1 = document.getElementById('p1').value;
+                    const p2 = document.getElementById('p2').value;
+                    if (p1.length < 6) return Swal.showValidationMessage('Min 6 karakter!');
+                    if (p1 !== p2) return Swal.showValidationMessage('Tidak cocok!');
+                    return p1;
+                },
+                showCancelButton: true, confirmButtonColor: '#1F2937',
+                customClass: { popup: 'rounded-3xl' }
+            });
+
+            if (pass) {
+                try {
+                    await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${sessionStorage.getItem('userName')}`, {
+                        method: 'PATCH',
+                        headers: { ...headers, "Content-Type": "application/json" },
+                        body: JSON.stringify({ password: pass })
+                    });
+                    Swal.fire({ icon: 'success', title: 'Password Terupdate!', timer: 1500, showConfirmButton: false });
+                } catch (error) { Swal.fire('Error', 'Gagal ganti password.', 'error'); }
+            }
+        }
+
+        // --- FUNGSI CORE ADMIN ---
         function generateRegNum(id, waktuAju) {
             const date = new Date(waktuAju);
             const tgl = ("0" + date.getDate()).slice(-2);
             const bln = ("0" + (date.getMonth() + 1)).slice(-2);
             const thn = date.getFullYear();
-            const tanggalLengkap = `${tgl}${bln}${thn}`; 
-            const unikID = ("0000" + id).slice(-4); 
-            return `REG/ITDA/${tanggalLengkap}/${unikID}`;
+            return `REG/ITDA/${tgl}${bln}${thn}/${("0000" + id).slice(-4)}`;
         }
 
         async function fetchAdmin() {
             const loader = document.getElementById('loader');
             const myWilayah = (sessionStorage.getItem('wilayah') || 'semua').trim().toLowerCase();
             loader.classList.remove('hidden');
+            
             let queryUrl = `${SUPABASE_URL}/rest/v1/konsultasi?select=*&order=waktu_pengajuan.desc`;
             if (myWilayah !== 'semua') { queryUrl += `&wilayah_opd=eq.${sessionStorage.getItem('wilayah')}`; }
+            
             try {
                 const res = await fetch(queryUrl, { headers: headers });
                 rawData = await res.json();
@@ -174,178 +312,124 @@
                 loader.classList.add('hidden');
                 updateAdminStats(rawData);
                 renderTable(filteredData);
-            } catch (e) { loader.innerHTML = `<span class="text-red-500 font-bold">⚠️ Gagal Memuat Database.</span>`; }
+            } catch (e) { loader.innerHTML = `<span class="text-red-500 font-bold">⚠️ Database Error.</span>`; }
         }
 
         function updateAdminStats(data) {
             document.getElementById('stat-wilayah-total').innerText = data.length;
-            document.getElementById('stat-wilayah-pending').innerText = data.filter(item => !item.jawaban || item.jawaban === "").length;
-            document.getElementById('stat-wilayah-proses').innerText = data.filter(item => (item.jawaban && item.jawaban !== "") && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length;
+            document.getElementById('stat-wilayah-pending').innerText = data.filter(item => !item.jawaban).length;
+            document.getElementById('stat-wilayah-proses').innerText = data.filter(item => item.jawaban && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length;
             document.getElementById('stat-wilayah-verif').innerText = data.filter(item => item.status_tl === "Menunggu Verifikasi").length;
             document.getElementById('stat-wilayah-done').innerText = data.filter(item => item.status_tl === "Tuntas").length;
         }
 
-        function renderTable(dataToRender) {
-            const adminBody = document.getElementById('adminBody');
-            if (!dataToRender || dataToRender.length === 0) {
-                adminBody.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-gray-400 italic uppercase text-[10px] tracking-widest">Data tidak ditemukan.</td></tr>`;
+        function renderTable(data) {
+            const body = document.getElementById('adminBody');
+            if (!data || data.length === 0) {
+                body.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-gray-400 italic text-[10px] tracking-widest">Tidak ada data.</td></tr>`;
                 return;
             }
-            adminBody.innerHTML = dataToRender.map(item => {
+            body.innerHTML = data.map(item => {
                 const id = item.id;
-                const regNum = generateRegNum(item.id, item.waktu_pengajuan);
-                const isTerjawab = item.jawaban && item.jawaban !== "";
-                const isVerif = item.status_tl === "Menunggu Verifikasi";
-                const isTuntas = item.status_tl === "Tuntas";
-                const isPerbaikan = item.status_tl === "Perlu Perbaikan";
+                const reg = generateRegNum(id, item.waktu_pengajuan);
+                const terjawab = item.jawaban && item.jawaban !== "";
+                const verif = item.status_tl === "Menunggu Verifikasi";
+                const tuntas = item.status_tl === "Tuntas";
+                const perbaikan = item.status_tl === "Perlu Perbaikan";
                 
-                const statusTlBadge = isTuntas ? "bg-teal-100 text-teal-700 border-teal-200" : (isVerif ? "bg-orange-100 text-orange-700 border-orange-200" : (isTerjawab ? "bg-green-100 text-green-700 border-green-200" : "bg-yellow-100 text-yellow-700 border-yellow-200"));
-                const statusTlText = isTuntas ? "Tuntas" : (isVerif ? "Verif TL" : (isTerjawab ? "Terjawab" : "Menunggu"));
+                const badge = tuntas ? "bg-teal-100 text-teal-700 border-teal-200" : (verif ? "bg-orange-100 text-orange-700 border-orange-200" : (terjawab ? "bg-green-100 text-green-700 border-green-200" : "bg-yellow-100 text-yellow-700 border-yellow-200"));
+                const txt = tuntas ? "Tuntas" : (verif ? "Verifikasi" : (terjawab ? "Terjawab" : "Menunggu"));
 
                 let previewBukti = "";
                 if(item.bukti_tl && item.bukti_tl.includes('drive.google.com')){
-                    const parts = item.bukti_tl.split('Link Dokumen: ');
-                    if(parts[1]) previewBukti = `<div class="preview-container"><iframe src="${parts[1].trim().replace('/view', '/preview')}" class="preview-iframe"></iframe></div>`;
+                    const link = item.bukti_tl.split('Link Dokumen: ')[1]?.split(' ')[0];
+                    if(link) previewBukti = `<div class="preview-container"><iframe src="${link.replace('/view', '/preview')}" class="preview-iframe"></iframe></div>`;
                 }
 
                 return `<tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
                     <td class="p-5 align-top w-48">
-                        <div class="text-[11px] font-black text-blue-600 mb-1 tracking-tighter">${regNum}</div>
+                        <div class="text-[11px] font-black text-blue-600 mb-1 tracking-tighter">${reg}</div>
                         <div class="text-[10px] text-gray-400 mb-1 italic">📅 ${new Date(item.waktu_pengajuan).toLocaleString('id-ID')}</div>
                         <span class="bg-gray-100 text-gray-500 px-2 py-0.5 rounded text-[8px] font-bold uppercase">${item.kategori}</span>
                     </td>
                     <td class="p-5 align-top">
                         <div class="font-black text-gray-800 uppercase text-[11px] mb-1">${item.instansi}</div>
-                        <div class="font-bold text-gray-700 mb-2 leading-tight text-xs">${item.judul_masalah}</div>
+                        <div class="font-bold text-gray-700 mb-2 text-xs leading-tight">${item.judul_masalah}</div>
                         <div class="text-[11px] text-gray-500 bg-gray-50 p-3 rounded-xl border border-gray-100 italic mb-2">"${item.rincian_masalah}"</div>
-                        
-                        ${isVerif ? `<div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-xs mt-3 mb-3">
-                            <span class="font-bold text-orange-700 uppercase text-[10px]">Laporan TL OPD:</span><br>
-                            <p class="mt-1 italic">"${item.bukti_tl.split('|')[0]}"</p>
-                            ${previewBukti}
-                        </div>` : ""}
-
-                        ${(isVerif || !isTerjawab || isPerbaikan) ? 
-                        `<textarea id="reply-${id}" class="w-full p-3 text-xs border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20" rows="3" placeholder="Berikan respon..."></textarea>` : 
-                        `<div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100 text-xs mt-2">
-                            <span class="font-bold text-blue-700">Terakhir:</span> ${isTuntas ? item.catatan_admin_tl : item.jawaban}
-                        </div>`}
+                        ${verif ? `<div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-xs mb-3">
+                            <span class="font-bold text-orange-700 uppercase text-[10px]">Bukti TL OPD:</span>
+                            <p class="mt-1 italic">"${item.bukti_tl.split('|')[0]}"</p>${previewBukti}</div>` : ""}
+                        ${(verif || !terjawab || perbaikan) ? `<textarea id="reply-${id}" class="w-full p-3 text-xs border rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none" rows="2" placeholder="Respon Auditor..."></textarea>` : 
+                        `<div class="text-[11px] text-blue-700 bg-blue-50 p-2 rounded-lg italic">Respon Terakhir: ${tuntas ? item.catatan_admin_tl : item.jawaban}</div>`}
                     </td>
-                    <td class="p-5 text-center align-top pt-8 w-32">
-                        <span class="inline-block w-24 py-1.5 text-[9px] font-black rounded-full border uppercase ${statusTlBadge}">${statusTlText}</span>
-                    </td>
+                    <td class="p-5 text-center align-top pt-8 w-32"><span class="inline-block w-24 py-1.5 text-[9px] font-black rounded-full border uppercase ${badge}">${txt}</span></td>
                     <td class="p-5 text-center align-top pt-6 w-40">
                         <div class="flex flex-col space-y-2">
-                            ${isVerif ? `
-                                <button onclick="handleVerifikasi(${id}, 'Tuntas')" class="bg-teal-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase shadow-md transition hover:bg-teal-700">✅ Tuntas</button>
-                                <button onclick="handleVerifikasi(${id}, 'Perlu Perbaikan')" class="bg-red-500 text-white py-2 rounded-lg text-[10px] font-bold uppercase shadow-md transition hover:bg-red-600">❌ Tolak TL</button>
-                            ` : (!isTerjawab || isPerbaikan ? `
-                                <button onclick="handleKirimJawaban(${id})" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase shadow-sm transition hover:bg-blue-700">Kirim Respon</button>
-                            ` : (isTuntas ? `
-                                <span class="text-[10px] text-teal-600 font-bold italic">Selesai</span>
-                            ` : `
-                                <button onclick="batalSelesai(${id})" class="bg-gray-400 text-white py-2 rounded-lg text-[10px] font-bold uppercase shadow-sm transition hover:bg-gray-500">Ubah Jawaban</button>
-                            `))}
-                            <a href="https://wa.me/${item.nomor_hp}" target="_blank" class="bg-green-500 text-white py-2 rounded-lg text-[10px] font-bold uppercase shadow-sm active:scale-95 transition">WhatsApp</a>
+                            ${verif ? `<button onclick="handleVerifikasi(${id}, 'Tuntas')" class="bg-teal-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase shadow-sm">✅ Tuntas</button>
+                                       <button onclick="handleVerifikasi(${id}, 'Perlu Perbaikan')" class="bg-red-500 text-white py-2 rounded-lg text-[10px] font-bold uppercase shadow-sm">❌ Tolak</button>` : 
+                            (!terjawab || perbaikan ? `<button onclick="handleKirimJawaban(${id})" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold uppercase">Kirim Respon</button>` : 
+                            (tuntas ? `<span class="text-[10px] text-teal-600 font-bold italic">Selesai</span>` : `<button onclick="batalSelesai(${id})" class="text-[9px] text-gray-400 underline uppercase">Ubah Jawaban</button>`))}
+                            <a href="https://wa.me/${item.nomor_hp}" target="_blank" class="bg-green-500 text-white py-2 rounded-lg text-[10px] font-bold uppercase text-center">WhatsApp</a>
                         </div>
                     </td>
                 </tr>`;
             }).join('');
         }
 
-        // FUNGSI FILTER BERDASARKAN KARTU STATISTIK
-        function filterByStatus(status) {
-            if(status === 'all') filteredData = rawData;
-            else if(status === 'pending') filteredData = rawData.filter(item => !item.jawaban || item.jawaban === "");
-            else if(status === 'proses') filteredData = rawData.filter(item => (item.jawaban && item.jawaban !== "") && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan"));
-            else if(status === 'verif') filteredData = rawData.filter(item => item.status_tl === "Menunggu Verifikasi");
-            else if(status === 'tuntas') filteredData = rawData.filter(item => item.status_tl === "Tuntas");
+        function filterByStatus(s) {
+            if(s === 'all') filteredData = rawData;
+            else if(s === 'pending') filteredData = rawData.filter(i => !i.jawaban);
+            else if(s === 'proses') filteredData = rawData.filter(i => i.jawaban && (i.status_tl === "Belum TL" || i.status_tl === "Perlu Perbaikan"));
+            else if(s === 'verif') filteredData = rawData.filter(i => i.status_tl === "Menunggu Verifikasi");
+            else if(s === 'tuntas') filteredData = rawData.filter(i => i.status_tl === "Tuntas");
             renderTable(filteredData);
         }
 
         function filterData() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            filteredData = rawData.filter(item => {
-                const regNum = generateRegNum(item.id, item.waktu_pengajuan).toLowerCase();
-                return (item.instansi && item.instansi.toLowerCase().includes(query)) || 
-                       (item.judul_masalah && item.judul_masalah.toLowerCase().includes(query)) ||
-                       regNum.includes(query);
-            });
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            filteredData = rawData.filter(i => i.instansi?.toLowerCase().includes(q) || i.judul_masalah?.toLowerCase().includes(q) || generateRegNum(i.id, i.waktu_pengajuan).toLowerCase().includes(q));
             renderTable(filteredData);
         }
 
-        // FUNGSI CETAK REKAP LAPORAN AUDITOR
         async function exportAdminPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a4');
-            const wilayah = sessionStorage.getItem('wilayah') || 'Kabupaten Malang';
-
-            doc.setFontSize(14);
-            doc.text(`LAPORAN MONITORING KONSULTASI - ${wilayah.toUpperCase()}`, 14, 15);
-            doc.setFontSize(10);
-            doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 14, 22);
-            doc.line(14, 25, 283, 25);
-
-            const tableData = filteredData.map(item => [
-                generateRegNum(item.id, item.waktu_pengajuan),
-                item.instansi,
-                item.judul_masalah,
-                item.kategori,
-                item.status_tl === 'Tuntas' ? 'TUNTAS' : (item.jawaban ? 'TERJAWAB' : 'PENDING')
-            ]);
-
-            doc.autoTable({
-                startY: 30,
-                head: [['No. Reg', 'Instansi', 'Judul Masalah', 'Kategori', 'Status']],
-                body: tableData,
-                theme: 'striped',
-                headStyles: { fillColor: [31, 41, 55] },
-                styles: { fontSize: 7 }
-            });
-
-            doc.save(`Rekap_SiCODI_${wilayah.replace(/\s+/g, '_')}.pdf`);
+            doc.text(`REKAP MONITORING - ${sessionStorage.getItem('wilayah') || 'KAB MALANG'}`, 14, 15);
+            const body = filteredData.map(i => [generateRegNum(i.id, i.waktu_pengajuan), i.instansi, i.judul_masalah, i.status_tl]);
+            doc.autoTable({ head: [['No. Reg', 'Instansi', 'Judul', 'Status']], body: body, startY: 25, theme: 'striped' });
+            doc.save('Rekap_PamanSigit.pdf');
         }
 
-        // FUNGSI AKSI (VERIF, KIRIM, BATAL)
-        async function handleVerifikasi(id, status) {
-            const catatan = document.getElementById(`reply-${id}`).value;
-            if(!catatan.trim()) return Swal.fire('Peringatan', 'Harap isi catatan verifikasi!', 'warning');
-            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, {
-                    method: 'PATCH',
-                    headers: headers,
-                    body: JSON.stringify({ status_tl: status, catatan_admin_tl: catatan })
-                });
-                if(!res.ok) throw new Error("Gagal verifikasi");
-                Swal.fire({ icon: 'success', title: 'Berhasil!', timer: 1500, showConfirmButton: false });
-                fetchAdmin();
-            } catch (e) { Swal.fire('Error', e.message, 'error'); }
+        async function handleVerifikasi(id, s) {
+            const c = document.getElementById(`reply-${id}`).value;
+            if(!c.trim()) return Swal.fire('Error', 'Catatan verifikasi wajib diisi!', 'warning');
+            await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ status_tl: s, catatan_admin_tl: c }) });
+            Swal.fire({ icon: 'success', title: 'Update Berhasil!', timer: 1500, showConfirmButton: false });
+            fetchAdmin();
         }
 
         async function handleKirimJawaban(id) {
-            const reply = document.getElementById(`reply-${id}`).value;
-            if(!reply.trim()) return Swal.fire('Error', 'Tulis jawaban dulu!', 'error');
-            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ jawaban: reply, waktu_jawaban: new Date().toISOString(), status_tl: "Belum TL" }) });
-                if(!res.ok) throw new Error("Gagal update");
-                Swal.fire({ icon: 'success', title: 'Terkirim!', timer: 1500, showConfirmButton: false });
-                fetchAdmin();
-            } catch (e) { Swal.fire('Gagal', e.message, 'error'); }
+            const r = document.getElementById(`reply-${id}`).value;
+            if(!r.trim()) return Swal.fire('Error', 'Tulis respon Auditor!', 'error');
+            await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ jawaban: r, waktu_jawaban: new Date().toISOString(), status_tl: "Belum TL" }) });
+            Swal.fire({ icon: 'success', title: 'Terkirim!', timer: 1500, showConfirmButton: false });
+            fetchAdmin();
         }
 
         async function batalSelesai(id) {
-            const { isConfirmed } = await Swal.fire({ title: 'Ubah Jawaban?', text: 'Status akan kembali menjadi Menunggu.', icon: 'warning', showCancelButton: true });
-            if(isConfirmed) {
-                await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ jawaban: null, waktu_jawaban: null, status_tl: "Belum TL" }) });
-                fetchAdmin();
-            }
+            const { isConfirmed } = await Swal.fire({ title: 'Ubah?', text: 'Ubah jawaban Auditor?', showCancelButton: true });
+            if(isConfirmed) { await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ jawaban: null, waktu_jawaban: null, status_tl: "Belum TL" }) }); fetchAdmin(); }
         }
 
-        window.onload = fetchAdmin;
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
-        function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
+        
+        window.addEventListener('click', function(e) {
+            const menu = document.getElementById('profile-menu');
+            const btn = document.getElementById('profile-btn');
+            if (menu && !menu.classList.contains('menu-hidden') && !btn.contains(e.target) && !menu.contains(e.target)) {
+                 menu.classList.add('menu-hidden'); menu.classList.remove('menu-visible');
+            }
+        });
     </script>
 </body>
 </html>
