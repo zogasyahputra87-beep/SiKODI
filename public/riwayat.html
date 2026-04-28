@@ -36,7 +36,6 @@
         .menu-hidden { transform: scale(0.95); opacity: 0; pointer-events: none; }
         .menu-visible { transform: scale(1); opacity: 1; pointer-events: auto; }
 
-        /* Bubble Style */
         .bubble { padding: 1rem; border-radius: 1rem; margin-bottom: 0.75rem; position: relative; font-size: 0.75rem; line-height: 1.4; border: 1px solid transparent; }
         .bubble-user { background: #f3f4f6; border-color: #e5e7eb; color: #374151; }
         .bubble-auditor { background: #eff6ff; border-color: #dbeafe; color: #1e40af; }
@@ -68,11 +67,11 @@
 
             <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50">
                 <div class="w-16 h-16 rounded-full profile-ring shadow-lg mb-3 overflow-hidden bg-gray-700">
-                    <img src="../pages/zoga.jpg" alt="Zoga" onerror="this.src='https://ui-avatars.com/api/?name=Ananda+Zoga'" class="w-full h-full object-cover">
+                    <img id="side-avatar" src="../pages/zoga.jpg" onerror="this.src='https://ui-avatars.com/api/?name=User'" class="w-full h-full object-cover">
                 </div>
                 <div class="text-center font-black">
                     <p class="text-[9px] text-blue-400 uppercase mb-1">Pengembang Sistem</p>
-                    <p class="text-[11px] font-bold text-gray-100 uppercase leading-tight">Ananda Zoga Syahputra, S.Tr.I.P.</p>
+                    <p id="side-nama-user" class="text-[11px] font-bold text-gray-100 uppercase leading-tight">User</p>
                 </div>
                 <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition">Keluar Sistem</button>
             </div>
@@ -84,21 +83,34 @@
                     <button onclick="toggleSidebar()" class="md:hidden p-2 bg-gray-100 rounded-lg"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
                     <div>
                         <h2 class="text-lg font-black text-gray-800 uppercase leading-tight">Monitoring Riwayat</h2>
-                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest" id="header-subtitle tracking-tighter">Daftar Pengajuan Privat</p>
+                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Daftar Pengajuan Privat</p>
                     </div>
                 </div>
-                <button onclick="refreshData()" class="flex items-center space-x-2 bg-gray-50 text-gray-600 px-4 py-2 rounded-xl border border-gray-200 shadow-sm font-black text-[10px] uppercase">
-                    <span id="refresh-icon">🔄</span><span>Refresh Data</span>
-                </button>
+                <div class="flex items-center space-x-3">
+                    <button onclick="refreshData()" class="flex items-center space-x-2 bg-gray-50 text-gray-600 px-4 py-2 rounded-xl border border-gray-200 shadow-sm font-black text-[10px] uppercase transition active:scale-95">
+                        <span id="refresh-icon">🔄</span><span>Refresh Data</span>
+                    </button>
+                    <div class="relative">
+                        <button onclick="toggleProfileMenu()" class="w-10 h-10 rounded-xl profile-ring overflow-hidden">
+                            <img id="head-avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full object-cover">
+                        </button>
+                        <div id="profile-menu" class="menu-hidden absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50">
+                            <div class="px-4 py-3 border-b border-gray-50 font-black">
+                                <p id="drop-nama-opd" class="text-xs text-gray-800 truncate">Nama OPD</p>
+                            </div>
+                            <button onclick="logout()" class="w-full text-left px-4 py-2 text-xs text-red-500 font-bold uppercase">🚀 Keluar</button>
+                        </div>
+                    </div>
+                </div>
             </header>
 
             <div class="p-6 md:p-10 relative z-10">
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black"><p class="text-[8px] text-gray-400 uppercase mb-1">Total</p><h3 id="user-stat-total" class="text-xl">...</h3></div>
-                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black"><p class="text-[8px] text-gray-400 uppercase mb-1 text-yellow-600">Menunggu</p><h3 id="user-stat-pending" class="text-xl text-yellow-600">...</h3></div>
-                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black border-b-4 border-b-blue-400"><p class="text-[8px] text-gray-400 uppercase mb-1 text-blue-500">Proses TL</p><h3 id="user-stat-tl" class="text-xl text-blue-500">...</h3></div>
-                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black"><p class="text-[8px] text-gray-400 uppercase mb-1 text-orange-600">Verifikasi</p><h3 id="user-stat-verif" class="text-xl text-orange-600">...</h3></div>
-                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black"><p class="text-[8px] text-gray-400 uppercase mb-1 text-teal-600">Tuntas</p><h3 id="user-stat-done" class="text-xl text-teal-600">...</h3></div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black"><p class="text-[8px] text-gray-400 uppercase mb-1">Total</p><h3 id="user-stat-total" class="text-xl">0</h3></div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black"><p class="text-[8px] text-gray-400 uppercase mb-1 text-yellow-600">Menunggu</p><h3 id="user-stat-pending" class="text-xl text-yellow-600">0</h3></div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black border-b-4 border-b-blue-400"><p class="text-[8px] text-gray-400 uppercase mb-1 text-blue-500">Proses TL</p><h3 id="user-stat-tl" class="text-xl text-blue-500">0</h3></div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black"><p class="text-[8px] text-gray-400 uppercase mb-1 text-orange-600">Verifikasi</p><h3 id="user-stat-verif" class="text-xl text-orange-600">0</h3></div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center font-black"><p class="text-[8px] text-gray-400 uppercase mb-1 text-teal-600">Tuntas</p><h3 id="user-stat-done" class="text-xl text-teal-600">0</h3></div>
                 </div>
 
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
@@ -115,7 +127,7 @@
                             <tbody id="listTable" class="divide-y divide-gray-50 text-sm font-bold"></tbody>
                         </table>
                     </div>
-                    <div id="loader" class="p-10 text-center text-gray-400 italic text-[10px] uppercase font-black">Menghubungkan ke Database...</div>
+                    <div id="loader" class="p-10 text-center text-gray-400 italic text-[10px] uppercase font-black">Memuat Data...</div>
                 </div>
             </div>
         </main>
@@ -131,60 +143,79 @@
         let originalContent = {};
 
         (function() {
-            if (sessionStorage.getItem('isLoggedIn') !== 'true') { window.location.href = 'login.html'; } 
-            else { document.body.style.display = "block"; document.getElementById('drop-nama-opd').innerText = sessionStorage.getItem('namaOpd'); loadData(); fetchProfilTerbaru(); }
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') { 
+                window.location.href = 'login.html'; 
+            } else { 
+                document.body.style.display = "block"; 
+                document.getElementById('drop-nama-opd').innerText = sessionStorage.getItem('namaOpd') || 'OPD'; 
+                document.getElementById('side-nama-user').innerText = sessionStorage.getItem('userName') || 'User';
+                loadData(); 
+                fetchProfilTerbaru(); 
+            }
         })();
 
         async function loadData() {
             const user = sessionStorage.getItem('userName');
+            if(!user) return;
             const url = `${SUPABASE_URL}/rest/v1/konsultasi?username=eq.${user}&order=waktu_pengajuan.desc`;
+            const loader = document.getElementById('loader');
+            
             try {
                 const res = await fetch(url, { headers });
                 rawRiwayat = await res.json();
+                loader.classList.add('hidden');
                 renderRiwayat(rawRiwayat);
                 updateStats(rawRiwayat);
-            } catch (e) { document.getElementById('loader').innerText = "Gagal memuat data."; }
+            } catch (e) { 
+                loader.innerText = "Gagal memuat data dari database."; 
+            }
         }
 
         function renderRiwayat(data) {
             const table = document.getElementById('listTable');
-            document.getElementById('loader').classList.add('hidden');
-            if (data.length === 0) { table.innerHTML = ""; return; }
+            if (!data || data.length === 0) { 
+                table.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-gray-400 font-black">BELUM ADA RIWAYAT KONSULTASI</td></tr>`; 
+                return; 
+            }
             
             table.innerHTML = data.map(item => {
-                const regNum = `REG/ITDA/${new Date(item.waktu_pengajuan).toLocaleDateString('id-ID').replace(/\//g,'')}/${("0000" + item.id).slice(-4)}`;
+                const id = item.id;
+                const regNum = `REG/ITDA/${new Date(item.waktu_pengajuan).toLocaleDateString('id-ID').replace(/\//g,'')}/${("0000" + id).slice(-4)}`;
                 const terjawab = item.jawaban && item.jawaban !== "";
-                const isTuntas = item.status_tl === 'Tuntas';
-                const isVerif = item.status_tl === 'Menunggu Verifikasi';
-                const isPerluPerbaikan = item.status_tl === 'Perlu Perbaikan';
+                const statusTl = item.status_tl;
+                const isTuntas = statusTl === 'Tuntas';
+                const isVerif = statusTl === 'Menunggu Verifikasi';
+                const isPerluPerbaikan = statusTl === 'Perlu Perbaikan';
 
-                // 1. Bubble Pertanyaan
                 let userFile = (item.file_lampiran && item.file_lampiran.includes('http')) ? 
-                    `<div class="attachment-box"><img src="${parseDriveLink(item.file_lampiran)}" onclick="window.open('${item.file_lampiran}')"></div>` : "";
+                    `<div class="attachment-box"><img src="${parseDriveLink(item.file_lampiran)}" onclick="window.open('${item.file_lampiran}')" alt="lampiran"></div>` : "";
 
-                // 2. Bubble Laporan TL
                 let tlBubble = "";
                 if (item.bukti_tl) {
                     const parts = item.bukti_tl.split(" | Link: ");
                     const link = parts[1];
-                    let tlFile = (link && link.includes('http')) ? `<div class="attachment-box"><img src="${parseDriveLink(link)}" onclick="window.open('${link}')"></div>` : "";
+                    let tlFile = (link && link.includes('http')) ? `<div class="attachment-box"><img src="${parseDriveLink(link)}" onclick="window.open('${link}')" alt="bukti tl"></div>` : "";
                     tlBubble = `<div class="bubble bubble-tl animate__animated animate__fadeIn"><span class="label-bubble text-orange-600">📝 Laporan TL Anda</span><div>${parts[0]}</div>${tlFile}</div>`;
                 }
 
-                // Action Button
                 const btnAction = (terjawab && !isTuntas && !isVerif) ? 
-                    `<div id="btn-tl-container-${item.id}"><button onclick="showInlineForm(${item.id})" class="mt-2 w-full py-2 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-blue-700 animate__animated animate__pulse animate__infinite">Kirim Bukti TL</button></div>` : "";
+                    `<div id="btn-tl-container-${id}"><button onclick="showInlineForm(${id})" class="mt-2 w-full py-2 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-blue-700 animate__animated animate__pulse animate__infinite">Kirim Bukti TL</button></div>` : "";
 
                 const badgeColor = isTuntas ? 'bg-teal-50 text-teal-600 border-teal-200' : (isVerif ? 'bg-orange-50 text-orange-600 border-orange-200' : (isPerluPerbaikan ? 'bg-red-50 text-red-600 border-red-200' : (terjawab ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-600 border-yellow-200')));
+                const statusTxt = isTuntas ? 'Tuntas' : (isVerif ? 'Verifikasi' : (isPerluPerbaikan ? 'Perbaikan' : (terjawab ? 'Terjawab' : 'Menunggu')));
 
-                return `<tr class="border-b border-gray-50 hover:bg-gray-50/50 transition">
+                return `<tr>
                     <td class="p-5 align-top pt-6">
                         <div class="text-[11px] font-black text-blue-600 mb-1 tracking-tighter">${regNum}</div>
                         <div class="text-[9px] text-gray-400 font-black">${new Date(item.waktu_pengajuan).toLocaleString('id-ID')}</div>
                     </td>
-                    <td class="p-5 align-top pt-6" style="width: 500px">
+                    <td class="p-5 align-top pt-6">
+                        <div class="text-[10px] font-bold uppercase text-blue-500 mb-1 tracking-tighter font-black font-black tracking-widest">${item.kategori}</div>
+                        <span class="text-[8px] bg-gray-100 px-2 py-0.5 rounded font-black border uppercase">${item.metode}</span>
+                    </td>
+                    <td class="p-5 align-top pt-6">
                         <div class="font-black text-gray-800 mb-3 uppercase tracking-tighter leading-tight">${item.judul_masalah}</div>
-                        <div id="timeline-box-${item.id}">
+                        <div id="timeline-box-${id}">
                             <div class="bubble bubble-user"><span class="label-bubble text-gray-500">❓ Konsultasi Anda</span><div>${item.rincian_masalah}</div>${userFile}</div>
                             ${terjawab ? `<div class="bubble bubble-auditor"><span class="label-bubble text-blue-600">🧑‍💻 Respon Auditor</span><div>${item.jawaban}</div></div>` : ""}
                             ${tlBubble}
@@ -192,7 +223,7 @@
                         ${btnAction}
                     </td>
                     <td class="p-5 text-center align-top pt-6">
-                        <span class="inline-block w-24 py-1.5 rounded-full text-[9px] font-black uppercase border ${badgeColor}">${isTuntas ? 'Tuntas' : (isVerif ? 'Verifikasi' : (isPerluPerbaikan ? 'Perbaikan' : (terjawab ? 'Terjawab' : 'Menunggu')))}</span>
+                        <span class="inline-block w-24 py-1.5 rounded-full text-[9px] font-black uppercase border ${badgeColor}">${statusTxt}</span>
                         ${isVerif ? `<p class="text-[8px] text-orange-600 font-black uppercase mt-2 italic animate-pulse">Menunggu Verifikasi Irban</p>` : ""}
                     </td>
                 </tr>`;
@@ -210,8 +241,8 @@
                     <label class="block text-[9px] font-black text-blue-600 uppercase mb-2">Dokumen Bukti (Opsional):</label>
                     <input type="file" id="input-tl-file-${id}" class="block w-full text-[10px] text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[9px] file:font-black file:bg-blue-50 file:text-blue-700 mb-4 cursor-pointer">
                     <div class="flex space-x-2">
-                        <button onclick="submitTLInline(${id})" class="flex-1 bg-green-600 text-white py-2 rounded-lg text-[10px] font-black uppercase shadow-md">Kirim Laporan</button>
-                        <button onclick="cancelTLInline(${id})" class="bg-gray-200 text-gray-600 px-4 py-2 rounded-lg text-[10px] font-black uppercase">Batal</button>
+                        <button onclick="submitTLInline(${id})" class="flex-1 bg-green-600 text-white py-2 rounded-lg text-[10px] font-black uppercase shadow-md active:scale-95 transition">Kirim Laporan</button>
+                        <button onclick="cancelTLInline(${id})" class="bg-gray-200 text-gray-600 px-4 py-2 rounded-lg text-[10px] font-black uppercase transition">Batal</button>
                     </div>
                 </div>`;
             btns.classList.add('hidden');
@@ -228,13 +259,13 @@
             if (!desc.trim()) return Swal.fire('Gagal', 'Respon wajib diisi!', 'warning');
 
             const container = document.getElementById(`timeline-box-${id}`);
-            container.innerHTML = `<div class="flex flex-col items-center py-6 animate-pulse"><span class="text-2xl mb-2 text-blue-600 animate-spin inline-block">🔄</span><p class="text-[10px] font-black text-blue-600 uppercase tracking-widest text-center font-black">Mengirim Laporan TL...</p></div>`;
+            container.innerHTML = `<div class="flex flex-col items-center py-6 animate-pulse"><span class="text-2xl mb-2 text-blue-600 animate-spin inline-block">🔄</span><p class="text-[10px] font-black text-blue-600 uppercase tracking-widest text-center">Mengirim Laporan...</p></div>`;
 
             try {
                 let fileLink = "Tidak ada dokumen dilampirkan";
                 if (file) {
                     const reader = new FileReader();
-                    const filePromise = new Promise((res, rej) => {
+                    const filePromise = new Promise((res) => {
                         reader.readAsDataURL(file);
                         reader.onload = async () => {
                             const b64 = reader.result.split(",")[1];
@@ -245,8 +276,8 @@
                     const upload = await filePromise;
                     if (upload.status === "success") fileLink = upload.fileLink;
                 }
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers: { ...headers }, body: JSON.stringify({ status_tl: "Menunggu Verifikasi", bukti_tl: `${desc} | Link: ${fileLink}` }) });
-                if (res.ok) { Swal.fire({ icon: 'success', title: 'TERKIRIM!', timer: 2000, showConfirmButton: false }); loadData(); }
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers, body: JSON.stringify({ status_tl: "Menunggu Verifikasi", bukti_tl: `${desc} | Link: ${fileLink}` }) });
+                if (res.ok) { Swal.fire({ icon: 'success', title: 'Berhasil!', timer: 2000, showConfirmButton: false }); loadData(); }
             } catch (e) { Swal.fire('Error', 'Gagal kirim.', 'error'); loadData(); }
         }
 
@@ -286,6 +317,7 @@
                     url = `https://drive.google.com/uc?export=view&id=${id}`;
                 }
                 document.getElementById('head-avatar').src = url + '?t=' + Date.now();
+                document.getElementById('side-avatar').src = url + '?t=' + Date.now();
             }
         }
     </script>
