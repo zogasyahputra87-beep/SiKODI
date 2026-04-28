@@ -29,9 +29,6 @@
             opacity: 0.5; z-index: 0; pointer-events: none;
         }
 
-        /* Checkbox styling */
-        .row-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: #3b82f6; }
-
         #profile-menu { transform-origin: top right; transition: all 0.2s ease-out; }
         .menu-hidden { transform: scale(0.95); opacity: 0; pointer-events: none; }
         .menu-visible { transform: scale(1); opacity: 1; pointer-events: auto; }
@@ -40,6 +37,10 @@
         .timeline-step::before { content: ''; position: absolute; left: -0.45rem; top: 0.25rem; width: 0.8rem; height: 0.8rem; border-radius: 50%; background: #cbd5e1; border: 2px solid #fff; }
         .timeline-active::before { background: #3b82f6; }
         .timeline-success::before { background: #10b981; }
+
+        /* Preview Iframe */
+        .preview-container { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; margin-top: 0.5rem; background: #f9fafb; }
+        .preview-iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 overflow-hidden">
@@ -58,7 +59,7 @@
             <nav class="flex-1 mt-6 px-4 space-y-1">
                 <a href="index.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">📊 Dashboard</a>
                 <a href="buat-konsultasi.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">➕ Buat Konsultasi</a>
-                <a href="riwayat.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-blue-500">📂 Riwayat Konsultasi</a>
+                <a href="riwayat.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-blue-500 shadow-lg">📂 Riwayat Konsultasi</a>
             </nav>
 
             <div class="p-6 border-t border-gray-700 flex flex-col items-center bg-gray-800/50 relative">
@@ -69,9 +70,11 @@
                     <p class="text-[9px] text-blue-400 uppercase font-black tracking-tighter mb-1">Pengembang Sistem</p>
                     <p class="text-[11px] font-bold text-gray-100 uppercase text-center leading-tight">Ananda Zoga Syahputra, S.Tr.I.P.</p>
                 </div>
-                <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition">Keluar Sistem</button>
+                <button onclick="logout()" class="mt-4 w-full px-4 py-2 text-[10px] font-bold uppercase text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition active:scale-95">Keluar Sistem</button>
             </div>
         </aside>
+
+        <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
         <main class="flex-1 flex flex-col overflow-y-auto">
             <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-8 h-20 sticky top-0 z-30 shadow-sm">
@@ -79,17 +82,20 @@
                     <button onclick="toggleSidebar()" class="md:hidden p-2 bg-gray-100 rounded-lg"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
                     <div>
                         <h2 class="text-lg font-black text-gray-800 uppercase leading-tight">Monitoring Riwayat</h2>
-                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Pilih data untuk diunduh</p>
+                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest" id="header-subtitle">Daftar Pengajuan Privat</p>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-3">
-                    <button onclick="exportData('pdf')" class="flex items-center space-x-2 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-xl border border-red-100 transition text-[10px] font-black uppercase">
-                        <span>PDF</span>
+                    <button id="btn-start-print" onclick="togglePrintMode(true)" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition text-[10px] font-black uppercase shadow-md active:scale-95">
+                        <span>🖨️ Cetak Riwayat</span>
                     </button>
-                    <button onclick="exportData('excel')" class="flex items-center space-x-2 bg-green-50 hover:bg-green-100 text-green-600 px-3 py-2 rounded-xl border border-green-100 transition text-[10px] font-black uppercase">
-                        <span>EXCEL</span>
-                    </button>
+
+                    <div id="print-options" class="hidden flex items-center space-x-2 animate__animated animate__fadeInRight">
+                        <button onclick="exportData('pdf')" class="bg-red-600 text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-red-700">Cetak PDF</button>
+                        <button onclick="exportData('excel')" class="bg-green-600 text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-green-700">Cetak Excel</button>
+                        <button onclick="togglePrintMode(false)" class="bg-gray-200 text-gray-600 px-3 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-gray-300">Batal</button>
+                    </div>
 
                     <div class="relative">
                         <button onclick="toggleProfileMenu()" id="profile-btn" class="flex items-center pl-4 border-l border-gray-200 focus:outline-none">
@@ -103,37 +109,58 @@
                             </div>
                             <button onclick="gantiProfil()" class="w-full text-left px-4 py-2 text-xs text-gray-600 hover:bg-blue-50">🖼️ Ganti Profil</button>
                             <button onclick="formGantiPassword()" class="w-full text-left px-4 py-2 text-xs text-gray-600 hover:bg-blue-50">🔑 Ganti Password</button>
-                            <button onclick="logout()" class="w-full text-left px-4 py-2 text-xs text-red-500 font-bold uppercase">🚀 Keluar</button>
+                            <button onclick="logout()" class="w-full text-left px-4 py-2 text-xs text-red-500 font-bold uppercase">🚀 Keluar Sistem</button>
                         </div>
                     </div>
                 </div>
             </header>
 
             <div class="p-6 md:p-10 relative z-10">
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8" id="stats-container"></div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8" id="stats-container">
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total</p>
+                        <h3 id="user-stat-total" class="text-xl font-black text-gray-800">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Menunggu</p>
+                        <h3 id="user-stat-pending" class="text-xl font-black text-yellow-600">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center border-b-4 border-b-blue-400">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Proses TL</p>
+                        <h3 id="user-stat-tl" class="text-xl font-black text-blue-500">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Verifikasi</p>
+                        <h3 id="user-stat-verif" class="text-xl font-black text-orange-600">...</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center">
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Tuntas</p>
+                        <h3 id="user-stat-done" class="text-xl font-black text-teal-600">...</h3>
+                    </div>
+                </div>
 
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                         <input type="text" id="searchInput" onkeyup="filterRiwayat()" placeholder="Cari No. Registrasi atau Judul..." class="p-3 border border-gray-200 rounded-xl text-xs w-full max-w-md focus:ring-2 focus:ring-blue-500 outline-none">
-                        <div class="text-[10px] font-bold text-blue-600 uppercase italic" id="selected-count">0 Data Terpilih</div>
+                        <div class="hidden text-[10px] font-bold text-blue-600 uppercase italic" id="selected-count">0 Data Terpilih</div>
                     </div>
                     <div class="overflow-x-auto custom-scrollbar">
                         <table class="w-full text-left border-collapse min-w-[1000px]">
                             <thead class="bg-gray-50 text-[10px] text-gray-400 uppercase font-bold tracking-widest border-b">
                                 <tr>
-                                    <th class="p-5 text-center" style="width: 50px">
-                                        <input type="checkbox" id="selectAll" onclick="toggleAllCheckboxes()" class="row-checkbox">
+                                    <th id="col-check-h" class="hidden p-5 text-center" style="width: 50px">
+                                        <input type="checkbox" id="selectAll" onclick="toggleAllCheckboxes()" class="w-4 h-4 cursor-pointer">
                                     </th>
-                                    <th class="p-5" style="width: 150px">No. Registrasi</th>
+                                    <th class="p-5" style="width: 170px">Waktu & No. Reg</th>
                                     <th class="p-5" style="width: 150px">Kategori</th>
-                                    <th class="p-5">Detail Monitoring</th>
+                                    <th class="p-5">Detail Monitoring & Timeline</th>
                                     <th class="p-5 text-center" style="width: 120px">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="listTable" class="divide-y divide-gray-50 text-sm"></tbody>
                         </table>
                     </div>
-                    <div id="loader" class="p-10 text-center text-gray-400 italic text-sm">Memuat Riwayat...</div>
+                    <div id="loader" class="p-10 text-center text-gray-400 italic text-sm uppercase">Menghubungkan ke Database...</div>
                 </div>
             </div>
         </main>
@@ -142,10 +169,12 @@
     <script>
         const SUPABASE_URL = "https://afaiwyfodjllolzwbhmz.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_0Jj5RTBAL3gewJvwOsvAxA_aPu370Bl"; 
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2l5RHPGfRBDGt4SJUyKycyAfvKBjHl7F9Prr6Oq82AMoGUAKLRticQPf55sKy-AZr/exec";
         const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
         
         let rawRiwayat = [];
 
+        // --- INISIALISASI ---
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') { window.location.href = 'login.html'; } 
             else {
@@ -177,27 +206,69 @@
                 const regNum = `REG/ITDA/${new Date(item.waktu_pengajuan).toLocaleDateString('id-ID').replace(/\//g,'')}/${("0000" + item.id).slice(-4)}`;
                 const terjawab = item.jawaban && item.jawaban !== "";
                 
-                return `<tr>
-                    <td class="p-5 text-center"><input type="checkbox" class="row-checkbox data-check" value="${item.id}" onclick="updateSelectedCount()"></td>
-                    <td class="p-5 align-top pt-6 font-black text-blue-600 text-[11px]">${regNum}</td>
-                    <td class="p-5 align-top pt-6"><div class="text-[10px] font-bold uppercase text-blue-500">${item.kategori}</div></td>
+                // Timeline Logic
+                let timeline = `<div class="timeline-step timeline-success"><b>Pengajuan:</b> ${item.rincian_masalah}</div>
+                                <div class="timeline-step ${terjawab ? 'timeline-active' : ''}"><b>Tanggapan Auditor:</b> ${item.jawaban || 'Menunggu tanggapan...'}</div>`;
+                
+                const btnAction = (terjawab && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")) ? 
+                                  `<button onclick="formTL(${item.id})" class="mt-2 w-full py-2 bg-blue-600 text-white rounded-lg text-[10px] font-bold uppercase hover:bg-blue-700 transition animate__animated animate__pulse animate__infinite">Kirim Bukti TL</button>` : "";
+
+                return `<tr class="border-b border-gray-50 hover:bg-gray-50/50 transition">
+                    <td class="col-check-d hidden p-5 text-center"><input type="checkbox" class="data-check w-4 h-4 cursor-pointer" value="${item.id}" onclick="updateSelectedCount()"></td>
+                    
+                    <td class="p-5 align-top pt-6">
+                        <div class="text-[11px] font-black text-blue-600 mb-1 tracking-tighter">${regNum}</div>
+                        <div class="text-[9px] text-gray-400">${new Date(item.waktu_pengajuan).toLocaleString('id-ID')}</div>
+                    </td>
+                    <td class="p-5 align-top pt-6">
+                        <div class="text-[10px] font-bold uppercase text-blue-500 mb-1">${item.kategori}</div>
+                        <span class="text-[8px] bg-gray-100 px-2 py-0.5 rounded font-black border uppercase">${item.metode}</span>
+                    </td>
                     <td class="p-5 align-top pt-6">
                         <div class="font-bold text-gray-800 mb-2">${item.judul_masalah}</div>
-                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs">
-                            <div class="timeline-step timeline-success"><b>Pengajuan:</b> ${item.rincian_masalah}</div>
-                            <div class="timeline-step ${terjawab ? 'timeline-active' : ''}"><b>Tanggapan:</b> ${item.jawaban || 'Menunggu...'}</div>
-                        </div>
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 text-xs">${timeline}</div>
+                        ${btnAction}
                     </td>
                     <td class="p-5 text-center align-top pt-6">
-                        <span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase border ${item.status_tl === 'Tuntas' ? 'bg-teal-50 text-teal-600 border-teal-200' : 'bg-yellow-50 text-yellow-600 border-yellow-200'}">
-                            ${item.status_tl}
+                        <span class="inline-block w-24 py-1.5 rounded-full text-[9px] font-bold uppercase border ${item.status_tl === 'Tuntas' ? 'bg-teal-50 text-teal-600 border-teal-200' : (terjawab ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-600 border-yellow-200')}">
+                            ${item.status_tl === 'Tuntas' ? 'Tuntas' : (terjawab ? 'Terjawab' : 'Menunggu')}
                         </span>
                     </td>
                 </tr>`;
             }).join('');
         }
 
-        // --- FITUR SELEKSI & EXPORT ---
+        // --- FUNGSI TOGGLE PRINT MODE ---
+        function togglePrintMode(isPrinting) {
+            const btnStart = document.getElementById('btn-start-print');
+            const printOptions = document.getElementById('print-options');
+            const colCheckH = document.getElementById('col-check-h');
+            const colCheckD = document.querySelectorAll('.col-check-d');
+            const selectedCountLabel = document.getElementById('selected-count');
+            const headerSubtitle = document.getElementById('header-subtitle');
+
+            if (isPrinting) {
+                btnStart.classList.add('hidden');
+                printOptions.classList.remove('hidden');
+                colCheckH.classList.remove('hidden');
+                colCheckD.forEach(el => el.classList.remove('hidden'));
+                selectedCountLabel.classList.remove('hidden');
+                headerSubtitle.innerText = "Mode Cetak Aktif: Pilih data";
+            } else {
+                btnStart.classList.remove('hidden');
+                printOptions.classList.add('hidden');
+                colCheckH.classList.add('hidden');
+                colCheckD.forEach(el => el.classList.add('hidden'));
+                selectedCountLabel.classList.add('hidden');
+                headerSubtitle.innerText = "Daftar Pengajuan Privat";
+                
+                // Reset Selection
+                document.getElementById('selectAll').checked = false;
+                document.querySelectorAll('.data-check').forEach(cb => cb.checked = false);
+                updateSelectedCount();
+            }
+        }
+
         function toggleAllCheckboxes() {
             const isChecked = document.getElementById('selectAll').checked;
             document.querySelectorAll('.data-check').forEach(cb => cb.checked = isChecked);
@@ -209,21 +280,18 @@
             document.getElementById('selected-count').innerText = `${count} Data Terpilih`;
         }
 
-        function getSelectedData() {
-            const selectedIds = Array.from(document.querySelectorAll('.data-check:checked')).map(cb => cb.value);
-            return rawRiwayat.filter(item => selectedIds.includes(item.id.toString()));
-        }
-
         async function exportData(type) {
-            const dataToExport = getSelectedData();
-            if (dataToExport.length === 0) return Swal.fire('Pilih Data', 'Centang minimal satu data yang ingin dicetak!', 'warning');
+            const selectedIds = Array.from(document.querySelectorAll('.data-check:checked')).map(cb => cb.value);
+            const dataToExport = rawRiwayat.filter(item => selectedIds.includes(item.id.toString()));
+
+            if (dataToExport.length === 0) return Swal.fire('Peringatan', 'Pilih minimal satu data!', 'warning');
 
             if (type === 'pdf') {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('l', 'mm', 'a4');
                 doc.text("LAPORAN RIWAYAT KONSULTASI - PAMAN SIGIT", 14, 15);
                 const body = dataToExport.map(item => [item.id, item.kategori, item.judul_masalah, item.status_tl]);
-                doc.autoTable({ head: [['ID', 'Kategori', 'Judul', 'Status']], body: body, startY: 25, theme: 'grid' });
+                doc.autoTable({ head: [['ID', 'Kategori', 'Judul', 'Status']], body: body, startY: 25, theme: 'striped' });
                 doc.save('Riwayat_PamanSigit.pdf');
             } else {
                 const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -231,16 +299,26 @@
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Riwayat");
                 XLSX.utils.writeFile(workbook, "Riwayat_PamanSigit.xlsx");
             }
-            Swal.fire('Berhasil', `Data berhasil diekspor ke ${type.toUpperCase()}`, 'success');
+            
+            Swal.fire('Berhasil', `Laporan ${type.toUpperCase()} telah diunduh.`, 'success');
+            togglePrintMode(false); // Keluar dari mode cetak setelah sukses
         }
 
-        // --- FUNGSI PROFIL & SISTEM ---
+        // --- SISTEM ---
         async function logout() {
-            const res = await Swal.fire({ title: 'Keluar?', text: "Yakin ingin keluar?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#1F2937' });
+            const res = await Swal.fire({ title: 'Konfirmasi Keluar', text: "Yakin ingin keluar?", icon: 'question', showCancelButton: true, confirmButtonColor: '#1F2937' });
             if (res.isConfirmed) { sessionStorage.clear(); window.location.href = 'login.html'; }
         }
-        function toggleProfileMenu() { const m = document.getElementById('profile-menu'); m.classList.toggle('menu-hidden'); m.classList.toggle('menu-visible'); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
+        function toggleProfileMenu() { const m = document.getElementById('profile-menu'); m.classList.toggle('menu-hidden'); m.classList.toggle('menu-visible'); }
+        function updateStats(data) {
+            document.getElementById('user-stat-total').innerText = data.length;
+            document.getElementById('user-stat-pending').innerText = data.filter(item => !item.jawaban).length;
+            document.getElementById('user-stat-tl').innerText = data.filter(item => item.jawaban && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length;
+            document.getElementById('user-stat-verif').innerText = data.filter(item => item.status_tl === "Menunggu Verifikasi").length;
+            document.getElementById('user-stat-done').innerText = data.filter(item => item.status_tl === "Tuntas").length;
+        }
+
         async function fetchProfilTerbaru() {
             const user = sessionStorage.getItem('userName');
             const res = await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${user}&select=foto_profil`, { headers });
@@ -254,7 +332,6 @@
                 document.getElementById('head-avatar').src = url + '?t=' + Date.now();
             }
         }
-        // ... (Fungsi Ganti Password & Ganti Profil Sama dengan Dashboard) ...
     </script>
 </body>
 </html>
