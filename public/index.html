@@ -28,12 +28,6 @@
             opacity: 0.5; z-index: 0; pointer-events: none;
         }
 
-        .text-watermark {
-            position: absolute; bottom: 10px; right: 20px; font-size: 60px; font-weight: 900;
-            color: rgba(255, 255, 255, 0.05); letter-spacing: 2px;
-            pointer-events: none; user-select: none; text-transform: uppercase;
-        }
-
         #profile-menu { transform-origin: top right; transition: all 0.2s ease-out; }
         .menu-hidden { transform: scale(0.95); opacity: 0; pointer-events: none; }
         .menu-visible { transform: scale(1); opacity: 1; pointer-events: auto; }
@@ -49,11 +43,11 @@
                 <img src="../pages/logo_kab.png" alt="Logo" class="w-14 mb-3 drop-shadow-md">
                 <div class="text-center">
                     <h1 class="text-xl font-bold text-white tracking-tight">PAMAN SIGIT</h1>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight text-center">Inspektorat Daerah<br>Kabupaten Malang</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-tight text-center font-bold">Inspektorat Daerah<br>Kabupaten Malang</p>
                 </div>
             </div>
             <nav class="flex-1 mt-6 px-4 space-y-1">
-                <a href="index.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-blue-500">📊 Dashboard</a>
+                <a href="index.html" class="bg-gray-700 text-white w-full flex items-center p-3 rounded-lg text-sm font-bold border-r-4 border-blue-500 shadow-lg">📊 Dashboard</a>
                 <a href="buat-konsultasi.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">➕ Buat Konsultasi</a>
                 <a href="riwayat.html" class="w-full flex items-center p-3 rounded-lg hover:bg-gray-800 transition text-sm">📂 Riwayat Konsultasi</a>
                 <div id="admin-link" class="hidden">
@@ -77,7 +71,7 @@
         <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
         
         <main class="flex-1 flex flex-col overflow-y-auto">
-            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-6 h-20 flex-shrink-0 sticky top-0 z-30">
+            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-6 h-20 flex-shrink-0 sticky top-0 z-30 shadow-sm">
                 <div class="flex items-center space-x-4">
                     <button onclick="toggleSidebar()" class="md:hidden p-2 bg-gray-100 rounded-lg text-gray-600">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
@@ -100,7 +94,7 @@
                                 <p id="head-opd-name" class="text-[10px] font-black text-gray-800 uppercase leading-none mb-1">NAMA OPD</p>
                                 <p id="head-username" class="text-[9px] text-blue-600 font-bold">@username</p>
                             </div>
-                            <div class="w-10 h-10 bg-blue-600 rounded-xl profile-ring shadow-lg ring-2 ring-blue-50 ring-offset-2 overflow-hidden transition group-hover:scale-105">
+                            <div class="w-10 h-10 bg-gray-200 rounded-xl profile-ring shadow-lg ring-2 ring-blue-50 ring-offset-2 overflow-hidden transition group-hover:scale-105">
                                 <img id="head-avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full object-cover">
                             </div>
                         </button>
@@ -127,54 +121,30 @@
 
             <div class="p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
                 <div class="bg-paman-dark text-white p-8 rounded-3xl shadow-xl relative overflow-hidden flex flex-col justify-center min-h-[180px] animate__animated animate__fadeIn">
-                    <div class="text-watermark">ITDA KAB. MLG</div>
                     <div class="relative z-10">
                         <h3 class="text-2xl font-black mb-2 text-blue-400 uppercase tracking-tighter">Portal PAMAN SIGIT Kabupaten Malang</h3>
                         <p class="text-gray-400 text-sm leading-relaxed mb-6 max-w-3xl">
-                            Selamat Datang kembali, <span id="welcome-opd" class="text-white font-bold italic">Instansi</span>. Anda dapat memantau seluruh progres pembinaan, pengawasan, serta tindak lanjut konsultasi digital secara real-time di bawah ini.
+                            Selamat Datang kembali, <span id="welcome-opd" class="text-white font-bold italic">Instansi</span>. Pantau progres pembinaan dan konsultasi digital secara real-time.
                         </p>
                         <div class="inline-flex items-center px-4 py-2 bg-gray-700/50 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-300 border border-gray-600">
                             <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-ping"></span>
-                            Status Sistem: <span class="ml-1 text-green-400 uppercase">Aktif & Terpantau</span>
+                            Status Sistem: <span class="ml-1 text-green-400 uppercase">Aktif</span>
                         </div>
                     </div>
                     <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
                 </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4">
-                    <div class="stat-card border-b-4 border-b-blue-500">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Konsultasi</p>
-                        <h3 id="stat-total" class="text-2xl font-black text-gray-800">...</h3>
-                    </div>
-                    <div class="stat-card border-b-4 border-b-yellow-500">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Menunggu Jawaban</p>
-                        <h3 id="stat-pending" class="text-2xl font-black text-yellow-600">...</h3>
-                    </div>
-                    <div class="stat-card border-b-4 border-b-blue-400">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Proses TL</p>
-                        <h3 id="stat-proses-tl" class="text-2xl font-black text-blue-500">...</h3>
-                    </div>
-                    <div class="stat-card border-b-4 border-b-orange-500 relative">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Verifikasi TL</p>
-                        <h3 id="stat-verif" class="text-2xl font-black text-orange-600">...</h3>
-                        <div id="ping-tl" class="hidden absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
-                    </div>
-                    <div class="stat-card border-b-4 border-b-teal-500">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Tuntas (Selesai)</p>
-                        <h3 id="stat-done" class="text-2xl font-black text-teal-600">...</h3>
-                    </div>
+                    <div class="stat-card border-b-4 border-b-blue-500"><p class="text-[8px] font-bold text-gray-400 uppercase mb-1">Total</p><h3 id="stat-total" class="text-2xl font-black">...</h3></div>
+                    <div class="stat-card border-b-4 border-b-yellow-500"><p class="text-[8px] font-bold text-gray-400 uppercase mb-1">Menunggu</p><h3 id="stat-pending" class="text-2xl font-black text-yellow-600">...</h3></div>
+                    <div class="stat-card border-b-4 border-b-blue-400"><p class="text-[8px] font-bold text-gray-400 uppercase mb-1">Proses TL</p><h3 id="stat-proses-tl" class="text-2xl font-black text-blue-500">...</h3></div>
+                    <div class="stat-card border-b-4 border-b-orange-500 relative"><p class="text-[8px] font-bold text-gray-400 uppercase mb-1">Verifikasi TL</p><h3 id="stat-verif" class="text-2xl font-black text-orange-600">...</h3><div id="ping-tl" class="hidden absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-ping"></div></div>
+                    <div class="stat-card border-b-4 border-b-teal-500"><p class="text-[8px] font-bold text-gray-400 uppercase mb-1">Tuntas</p><h3 id="stat-done" class="text-2xl font-black text-teal-600">...</h3></div>
                 </div>
 
                 <div class="bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h3 class="text-sm font-black text-gray-800 uppercase tracking-tighter text-blue-600">Analisis Tren Konsultasi</h3>
-                            <p class="text-[9px] text-gray-400 uppercase font-bold tracking-widest">Statistik Bulanan Tahun <span id="current-year-label">2026</span></p>
-                        </div>
-                    </div>
-                    <div class="h-72">
-                        <canvas id="yearlyChart"></canvas>
-                    </div>
+                    <h3 class="text-sm font-black text-gray-800 uppercase text-blue-600">Tren Konsultasi 2026</h3>
+                    <div class="h-72 mt-6"><canvas id="yearlyChart"></canvas></div>
                 </div>
             </div>
         </main>
@@ -185,10 +155,9 @@
         const SUPABASE_KEY = "sb_publishable_0Jj5RTBAL3gewJvwOsvAxA_aPu370Bl";
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2l5RHPGfRBDGt4SJUyKycyAfvKBjHl7F9Prr6Oq82AMoGUAKLRticQPf55sKy-AZr/exec";
         const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` };
-        
         let myChart;
 
-        // --- INISIALISASI HALAMAN ---
+        // --- INISIALISASI ---
         (function() {
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'login.html';
@@ -196,47 +165,69 @@
                 document.body.style.display = "block";
                 const name = sessionStorage.getItem('namaOpd');
                 const user = sessionStorage.getItem('userName');
-                const role = sessionStorage.getItem('userRole');
-                if(role === 'admin') document.getElementById('admin-link').classList.remove('hidden');
+                
+                if(sessionStorage.getItem('userRole') === 'admin') document.getElementById('admin-link').classList.remove('hidden');
                 
                 document.getElementById('head-opd-name').innerText = name;
                 document.getElementById('drop-nama-opd').innerText = name;
                 document.getElementById('head-username').innerText = '@' + user;
-                document.getElementById('head-avatar').src = `https://ui-avatars.com/api/?name=${name.replace(/\s+/g, '+')}&background=0D8ABC&color=fff`;
                 document.getElementById('welcome-opd').innerText = name;
-                document.getElementById('current-year-label').innerText = new Date().getFullYear();
                 
+                // Gunakan placeholder awal
+                document.getElementById('head-avatar').src = `https://ui-avatars.com/api/?name=${name.replace(/\s+/g, '+')}&background=0D8ABC&color=fff`;
+
                 startClock();
                 initChart();
-                
-                // LANGSUNG JALANKAN FETCHING DATA SAAT START
                 updateStats(); 
-                fetchProfilTerbaru();
+                fetchProfilTerbaru(); // PANGGIL SETELAH DOM READY
             }
         })();
 
-        // --- FUNGSI PROFIL ---
-        function toggleProfileMenu() {
-            const menu = document.getElementById('profile-menu');
-            menu.classList.toggle('menu-hidden');
-            menu.classList.toggle('menu-visible');
+        // --- LOGOUT DENGAN KONFIRMASI ---
+        async function logout() {
+            const result = await Swal.fire({
+                title: 'Konfirmasi Keluar',
+                text: "Apakah Anda yakin ingin keluar dari sistem PAMAN SIGIT?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1F2937',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'rounded-3xl' }
+            });
+
+            if (result.isConfirmed) {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
         }
 
+        // --- FIX FOTO PROFIL ---
         async function fetchProfilTerbaru() {
             const user = sessionStorage.getItem('userName');
             try {
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/users_opd?username=eq.${user}&select=foto_profil`, { headers: headers });
                 const data = await res.json();
+                
                 if (data.length > 0 && data[0].foto_profil) {
                     let finalUrl = data[0].foto_profil;
-                    // Fix link Google Drive
+                    // Konversi Link Google Drive ke Direct Image Link
                     if (finalUrl.includes('drive.google.com')) {
-                        const fileId = finalUrl.split('/d/')[1]?.split('/')[0] || finalUrl.split('id=')[1];
+                        let fileId = "";
+                        if (finalUrl.includes('/d/')) {
+                            fileId = finalUrl.split('/d/')[1].split('/')[0];
+                        } else if (finalUrl.includes('id=')) {
+                            fileId = finalUrl.split('id=')[1].split('&')[0];
+                        }
                         if(fileId) finalUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
                     }
-                    document.getElementById('head-avatar').src = finalUrl;
+                    
+                    const img = document.getElementById('head-avatar');
+                    // Tambahkan timestamp agar tidak terkena cache browser
+                    img.src = finalUrl + (finalUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
                 }
-            } catch (error) { console.error("Gagal memuat foto profil."); }
+            } catch (error) { console.error("Gagal load profil kustom."); }
         }
 
         async function gantiProfil() {
@@ -269,8 +260,8 @@
                                 body: JSON.stringify({ foto_profil: uploadResult.fileLink })
                             });
                             Swal.fire({ icon: 'success', title: 'Berhasil!', timer: 1500, showConfirmButton: false });
-                            fetchProfilTerbaru();
-                        } else { throw new Error(); }
+                            setTimeout(fetchProfilTerbaru, 1000); // Tunggu sebentar baru refresh foto
+                        }
                     } catch (err) { Swal.fire('Error', 'Gagal update.', 'error'); }
                 };
             }
@@ -306,74 +297,19 @@
             }
         }
 
-        // --- FUNGSI CORE DASHBOARD ---
-        function startClock() {
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('realtime-clock').innerText = now.toLocaleTimeString('id-ID', { hour12: false });
-                document.getElementById('realtime-date').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-            }, 1000);
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('yearlyChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-                    datasets: [{
-                        label: 'Laporan Masuk',
-                        data: Array(12).fill(0),
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 4, tension: 0.4, fill: true,
-                        pointBackgroundColor: '#3b82f6', pointBorderColor: '#fff', pointRadius: 5
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
-        }
-
-        async function updateStats() {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?select=status_tl,jawaban,waktu_pengajuan`, { headers: headers });
-                const data = await response.json();
-                
-                document.getElementById('stat-total').innerText = data.length;
-                document.getElementById('stat-pending').innerText = data.filter(item => !item.jawaban).length;
-                document.getElementById('stat-proses-tl').innerText = data.filter(item => item.jawaban && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length;
-                const v = data.filter(item => item.status_tl === 'Menunggu Verifikasi').length;
-                document.getElementById('stat-verif').innerText = v;
-                document.getElementById('stat-done').innerText = data.filter(item => item.status_tl === 'Tuntas').length;
-
-                const monthlyData = Array(12).fill(0);
-                data.forEach(item => {
-                    const date = new Date(item.waktu_pengajuan);
-                    if(date.getFullYear() === new Date().getFullYear()) monthlyData[date.getMonth()]++;
-                });
-                myChart.data.datasets[0].data = monthlyData;
-                myChart.update();
-                document.getElementById('ping-tl').classList.toggle('hidden', v === 0);
-            } catch (error) { console.error("Gagal update statistik."); }
-        }
-
-        async function manualRefresh() {
-            const icon = document.getElementById('icon-refresh');
-            icon.classList.add('spin'); 
-            await updateStats();
-            setTimeout(() => icon.classList.remove('spin'), 800);
-        }
-
+        // --- SISTEM ---
+        function toggleProfileMenu() { const menu = document.getElementById('profile-menu'); menu.classList.toggle('menu-hidden'); menu.classList.toggle('menu-visible'); }
+        function startClock() { setInterval(() => { const now = new Date(); document.getElementById('realtime-clock').innerText = now.toLocaleTimeString('id-ID', { hour12: false }); document.getElementById('realtime-date').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }, 1000); }
+        function initChart() { const ctx = document.getElementById('yearlyChart').getContext('2d'); myChart = new Chart(ctx, { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'], datasets: [{ label: 'Konsultasi', data: Array(12).fill(0), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 4, tension: 0.4, fill: true, pointBackgroundColor: '#3b82f6', pointBorderColor: '#fff', pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
+        async function updateStats() { try { const response = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?select=status_tl,jawaban,waktu_pengajuan`, { headers: headers }); const data = await response.json(); document.getElementById('stat-total').innerText = data.length; document.getElementById('stat-pending').innerText = data.filter(item => !item.jawaban).length; document.getElementById('stat-proses-tl').innerText = data.filter(item => item.jawaban && (item.status_tl === "Belum TL" || item.status_tl === "Perlu Perbaikan")).length; const v = data.filter(item => item.status_tl === 'Menunggu Verifikasi').length; document.getElementById('stat-verif').innerText = v; document.getElementById('stat-done').innerText = data.filter(item => item.status_tl === 'Tuntas').length; const monthlyData = Array(12).fill(0); data.forEach(item => { const date = new Date(item.waktu_pengajuan); if(date.getFullYear() === new Date().getFullYear()) monthlyData[date.getMonth()]++; }); myChart.data.datasets[0].data = monthlyData; myChart.update(); document.getElementById('ping-tl').classList.toggle('hidden', v === 0); } catch (error) { console.error("Gagal update statistik."); } }
+        async function manualRefresh() { const icon = document.getElementById('icon-refresh'); icon.classList.add('spin'); await updateStats(); setTimeout(() => icon.classList.remove('spin'), 800); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
-        function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
 
-        // Logic tutup dropdown
         window.addEventListener('click', function(e) {
             const menu = document.getElementById('profile-menu');
             const btn = document.getElementById('profile-btn');
             if (menu && !menu.classList.contains('menu-hidden') && !btn.contains(e.target) && !menu.contains(e.target)) {
-                 menu.classList.add('menu-hidden');
-                 menu.classList.remove('menu-visible');
+                 menu.classList.add('menu-hidden'); menu.classList.remove('menu-visible');
             }
         });
     </script>
