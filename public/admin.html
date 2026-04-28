@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel | PAMAN SIGIT</title>
-    <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="../pages/logo_kab.png">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
@@ -22,35 +19,21 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .profile-ring { padding: 2px; background: linear-gradient(to bottom right, #3b82f6, #1e40af); }
         .bg-paman-dark { background-color: #1F2937; }
-
         .spin { animation: rotate 0.8s linear; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .watermark-fixed {
-            position: fixed; bottom: -30px; right: -30px; width: 500px; height: 500px;
-            background-image: url('../pages/inspektorat.png');
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            opacity: 0.5; z-index: 0; pointer-events: none;
-        }
-
-        #profile-menu { transform-origin: top right; transition: all 0.2s ease-out; }
-        .menu-hidden { transform: scale(0.95); opacity: 0; pointer-events: none; }
-        .menu-visible { transform: scale(1); opacity: 1; pointer-events: auto; }
-
-        /* Bubble Style untuk Riwayat */
-        .bubble { padding: 1rem; border-radius: 1rem; margin-bottom: 0.75rem; position: relative; font-size: 0.75rem; line-height: 1.4; border: 1px solid transparent; }
+        
+        .bubble { padding: 1rem; border-radius: 1rem; margin-bottom: 0.75rem; font-size: 0.75rem; line-height: 1.4; border: 1px solid transparent; }
         .bubble-user { background: #f3f4f6; border-color: #e5e7eb; color: #374151; }
         .bubble-auditor { background: #eff6ff; border-color: #dbeafe; color: #1e40af; }
         .bubble-tl { background: #fff7ed; border-color: #ffedd5; color: #9a3412; }
+        .bubble-catatan { background: #f0fdf4; border-color: #dcfce7; color: #166534; }
         .label-bubble { font-size: 9px; font-weight: 900; text-transform: uppercase; margin-bottom: 4px; display: block; letter-spacing: 0.05em; }
-        
-        .attachment-box { margin-top: 8px; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; max-width: 250px; }
-        .attachment-box img { width: 100%; height: auto; cursor: pointer; }
+        .attachment-box { margin-top: 8px; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; max-width: 200px; }
+        .attachment-box img { width: 100%; height: auto; cursor: zoom-in; }
+        .admin-stat-card { @apply bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col transition-all hover:shadow-md cursor-pointer hover:-translate-y-1; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 overflow-hidden">
-
-    <div class="watermark-fixed"></div>
 
     <div class="flex h-screen overflow-hidden relative z-10">
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-paman-dark text-gray-300 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl">
@@ -58,7 +41,7 @@
                 <img src="../pages/logo_kab.png" alt="Logo" class="w-14 mb-3 drop-shadow-md">
                 <div class="text-center font-black">
                     <h1 class="text-xl font-bold text-white tracking-tight uppercase">Admin Panel</h1>
-                    <p id="admin-wilayah-label" class="text-[10px] text-blue-400 uppercase tracking-widest leading-tight">Memuat...</p>
+                    <p id="admin-wilayah-label" class="text-[10px] text-blue-400 uppercase tracking-widest leading-tight font-black">Memuat...</p>
                 </div>
             </div>
             <nav class="flex-1 mt-6 px-4 space-y-2 font-bold uppercase text-[10px]">
@@ -78,33 +61,38 @@
             <header class="bg-white border-b p-4 px-8 h-20 flex justify-between items-center shadow-sm sticky top-0 z-30">
                 <div class="flex items-center flex-1">
                     <button onclick="toggleSidebar()" class="md:hidden mr-4 p-2 bg-gray-100 rounded-lg"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
-                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari OPD atau No Reg..." class="w-full max-w-md px-4 py-2 border border-gray-200 rounded-xl bg-gray-50 text-xs focus:ring-2 focus:ring-blue-500 outline-none font-bold">
+                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari Nama OPD atau No Reg..." class="w-full max-w-md px-4 py-2 border border-gray-200 rounded-xl bg-gray-50 text-xs focus:ring-2 focus:ring-blue-500 outline-none font-bold">
                 </div>
-                <button onclick="refreshAdminData()" class="flex items-center space-x-2 bg-gray-50 text-gray-600 px-4 py-2 rounded-lg border border-gray-200 shadow-sm font-black text-[10px] uppercase"><span id="refresh-icon-admin">🔄</span><span>Refresh</span></button>
+                <div class="flex items-center space-x-3">
+                    <button onclick="refreshAdminData()" class="flex items-center space-x-2 bg-gray-50 text-gray-600 px-4 py-2 rounded-lg border border-gray-200 shadow-sm font-black text-[10px] uppercase"><span id="refresh-icon-admin">🔄</span><span>Refresh</span></button>
+                    <button onclick="togglePrintMode(true)" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-[10px] font-black border border-red-100 uppercase shadow-sm">📄 Cetak Rekap</button>
+                </div>
             </header>
 
             <div class="p-8 relative z-10">
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-                    <div class="admin-stat-card border-l-4 border-blue-500 p-4 bg-white rounded-2xl"><p class="text-[8px] font-black text-gray-400 uppercase">Total</p><h3 id="stat-wilayah-total" class="text-xl font-black">0</h3></div>
-                    <div class="admin-stat-card border-l-4 border-yellow-500 p-4 bg-white rounded-2xl"><p class="text-[8px] font-black text-gray-400 uppercase">Belum Dijawab</p><h3 id="stat-wilayah-pending" class="text-xl font-black text-yellow-600">0</h3></div>
-                    <div class="admin-stat-card border-l-4 border-orange-500 p-4 bg-white rounded-2xl"><p class="text-[8px] font-black text-gray-400 uppercase">Verifikasi TL</p><h3 id="stat-wilayah-verif" class="text-xl font-black text-orange-600">0</h3></div>
-                    <div class="admin-stat-card border-l-4 border-teal-500 p-4 bg-white rounded-2xl"><p class="text-[8px] font-black text-gray-400 uppercase">Tuntas</p><h3 id="stat-wilayah-done" class="text-xl font-black text-teal-600">0</h3></div>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                    <div onclick="filterByStatus('all')" class="admin-stat-card border-l-4 border-blue-500 font-black"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-black">Total</p><h3 id="stat-wilayah-total" class="text-2xl font-black text-gray-800">0</h3></div>
+                    <div onclick="filterByStatus('pending')" class="admin-stat-card border-l-4 border-yellow-500 font-black"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-black">Belum Dijawab</p><h3 id="stat-wilayah-pending" class="text-2xl font-black text-yellow-600">0</h3></div>
+                    <div onclick="filterByStatus('proses')" class="admin-stat-card border-l-4 border-blue-400 font-black"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-black">Proses TL</p><h3 id="stat-wilayah-proses" class="text-2xl font-black text-blue-500">0</h3></div>
+                    <div onclick="filterByStatus('verif')" class="admin-stat-card border-l-4 border-orange-500 font-black"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-black">Verifikasi</p><h3 id="stat-wilayah-verif" class="text-2xl font-black text-orange-600">0</h3></div>
+                    <div onclick="filterByStatus('tuntas')" class="admin-stat-card border-l-4 border-teal-500 font-black"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-black">Tuntas</p><h3 id="stat-wilayah-done" class="text-2xl font-black text-teal-600">0</h3></div>
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="overflow-x-auto custom-scrollbar">
-                        <table class="w-full text-left min-w-[1100px]">
+                        <table class="w-full text-left min-w-[1200px]">
                             <thead class="bg-gray-50 border-b border-gray-100">
                                 <tr class="text-[10px] text-gray-400 font-black uppercase tracking-widest">
-                                    <th class="p-5" style="width: 200px">Identitas Pengajuan</th>
-                                    <th class="p-5">Alur Riwayat Konsultasi (End-to-End)</th>
-                                    <th class="p-5 text-center" style="width: 150px">Tindakan Auditor</th>
+                                    <th class="p-5" style="width: 220px">Informasi OPD</th>
+                                    <th class="p-5">Alur Riwayat Konsultasi</th>
+                                    <th class="p-5 text-center" style="width: 120px">Status</th>
+                                    <th class="p-5 text-center" style="width: 220px">Tindakan Auditor</th>
                                 </tr>
                             </thead>
                             <tbody id="adminBody" class="divide-y divide-gray-50 text-sm font-bold"></tbody>
                         </table>
                     </div>
-                    <div id="loader" class="p-10 text-center text-gray-400 italic text-[10px] uppercase font-black animate-pulse">Menghubungkan ke Database Inspektorat...</div>
+                    <div id="loader" class="p-10 text-center text-gray-400 italic text-[10px] uppercase font-black">Menghubungkan Database...</div>
                 </div>
             </div>
         </main>
@@ -121,22 +109,20 @@
                 window.location.href = 'login.html';
             } else { 
                 document.body.style.display = "block";
-                document.getElementById('admin-wilayah-label').innerText = sessionStorage.getItem('wilayah') || 'Admin';
+                document.getElementById('admin-wilayah-label').innerText = sessionStorage.getItem('wilayah') || 'Wilayah';
                 fetchAdmin();
             }
         })();
 
         async function fetchAdmin() {
-            const loader = document.getElementById('loader');
-            loader.classList.remove('hidden');
             let queryUrl = `${SUPABASE_URL}/rest/v1/konsultasi?select=*&order=waktu_pengajuan.desc`;
-            const myWilayah = (sessionStorage.getItem('wilayah') || 'semua').trim().toLowerCase();
-            if (myWilayah !== 'semua') { queryUrl += `&wilayah_opd=eq.${sessionStorage.getItem('wilayah')}`; }
+            const wilayah = (sessionStorage.getItem('wilayah') || 'semua').toLowerCase();
+            if (wilayah !== 'semua') queryUrl += `&wilayah_opd=eq.${sessionStorage.getItem('wilayah')}`;
             
             try {
                 const res = await fetch(queryUrl, { headers });
                 rawData = await res.json();
-                loader.classList.add('hidden');
+                document.getElementById('loader').classList.add('hidden');
                 updateAdminStats(rawData);
                 renderTable(rawData);
             } catch (e) { console.error(e); }
@@ -144,86 +130,64 @@
 
         function renderTable(data) {
             const body = document.getElementById('adminBody');
-            if (!data.length) { body.innerHTML = `<tr><td colspan="3" class="p-10 text-center font-black">Data Kosong.</td></tr>`; return; }
-            
             body.innerHTML = data.map(item => {
                 const id = item.id;
                 const regNum = generateRegNum(id, item.waktu_pengajuan);
-                const statusTl = item.status_tl;
-                const terjawab = item.jawaban && item.jawaban !== "";
-                const verif = statusTl === "Menunggu Verifikasi";
-                const tuntas = statusTl === "Tuntas";
+                const isTerjawab = item.jawaban && item.jawaban !== "";
+                const isVerif = item.status_tl === "Menunggu Verifikasi";
+                const isTuntas = item.status_tl === "Tuntas";
+                const isPerbaikan = item.status_tl === "Perlu Perbaikan";
 
-                // --- 1. Bubble Pertanyaan ---
-                let userAttachment = "";
-                if (item.file_lampiran && item.file_lampiran.includes('http')) {
-                    userAttachment = `<div class="attachment-box"><img src="${parseDriveLink(item.file_lampiran)}" onclick="window.open('${item.file_lampiran}')"></div>`;
-                }
-                const bubblePertanyaan = `
-                    <div class="bubble bubble-user">
-                        <span class="label-bubble text-blue-600">❓ Masalah dari Pengguna</span>
-                        <div class="font-black text-gray-800 mb-1">${item.judul_masalah}</div>
-                        <div class="italic">"${item.rincian_masalah}"</div>
-                        ${userAttachment}
-                    </div>`;
-
-                // --- 2. Bubble Jawaban Auditor ---
-                const bubbleJawaban = terjawab ? `
-                    <div class="bubble bubble-auditor">
-                        <span class="label-bubble text-blue-700">🧑‍💻 Respon Auditor</span>
-                        <div>${item.jawaban}</div>
-                    </div>` : "";
-
-                // --- 3. Bubble Tindak Lanjut OPD ---
-                let bubbleTl = "";
+                // --- 1. Bubble Alur ---
+                let userFile = (item.file_lampiran && item.file_lampiran.includes('http')) ? `<div class="attachment-box"><img src="${parseDriveLink(item.file_lampiran)}" onclick="window.open('${item.file_lampiran}')"></div>` : "";
+                let tlBubble = "";
                 if (item.bukti_tl) {
                     const parts = item.bukti_tl.split(" | Link: ");
-                    const link = parts[1];
-                    let tlAttachment = (link && link.includes('http')) ? `<div class="attachment-box"><img src="${parseDriveLink(link)}" onclick="window.open('${link}')"></div>` : "";
-                    
-                    bubbleTl = `
-                        <div class="bubble bubble-tl animate__animated animate__fadeIn">
-                            <span class="label-bubble text-orange-600">📝 Laporan Tindak Lanjut (OPD)</span>
-                            <div class="font-bold">${parts[0]}</div>
-                            ${tlAttachment}
-                        </div>`;
+                    let tlFile = (parts[1] && parts[1].includes('http')) ? `<div class="attachment-box"><img src="${parseDriveLink(parts[1])}" onclick="window.open('${parts[1]}')"></div>` : "";
+                    tlBubble = `<div class="bubble bubble-tl"><span class="label-bubble text-orange-600">📝 Laporan TL OPD</span><div>${parts[0]}</div>${tlFile}</div>`;
                 }
+                
+                let catatanBubble = (isTuntas || isPerbaikan) && item.catatan_admin_tl ? `<div class="bubble bubble-catatan"><span class="label-bubble text-green-700">📌 Catatan Akhir Auditor</span><div>${item.catatan_admin_tl}</div></div>` : "";
 
-                // --- 4. Kolom Tindakan ---
-                let tindakanHtml = "";
-                if (!terjawab) {
-                    tindakanHtml = `
-                        <textarea id="reply-${id}" class="w-full p-2 text-[10px] border rounded-lg mb-2 outline-none focus:ring-1" placeholder="Ketik jawaban..."></textarea>
-                        <button onclick="handleAction(${id}, 'Kirim')" class="w-full bg-blue-600 text-white py-2 rounded-lg text-[10px] font-black uppercase">Kirim Respon</button>`;
-                } else if (verif) {
-                    tindakanHtml = `
-                        <textarea id="reply-${id}" class="w-full p-2 text-[10px] border rounded-lg mb-2 outline-none focus:ring-1" placeholder="Catatan verifikasi..."></textarea>
-                        <div class="flex space-x-1">
-                            <button onclick="handleAction(${id}, 'Tuntas')" class="flex-1 bg-teal-600 text-white py-2 rounded-lg text-[9px] font-black uppercase">Setujui</button>
-                            <button onclick="handleAction(${id}, 'Perlu Perbaikan')" class="flex-1 bg-red-500 text-white py-2 rounded-lg text-[9px] font-black uppercase">Tolak</button>
-                        </div>`;
-                } else if (tuntas) {
-                    tindakanHtml = `<div class="text-teal-600 text-[10px] font-black uppercase italic text-center">✅ Sudah Tuntas</div>`;
+                // --- 2. Kolom Status ---
+                const badge = isTuntas ? "bg-teal-50 text-teal-600 border-teal-200" : (isVerif ? "bg-orange-50 text-orange-600 border-orange-200" : (isTerjawab ? "bg-green-50 text-green-700 border-green-200" : "bg-yellow-50 text-yellow-700 border-yellow-200"));
+                const txt = isTuntas ? "Tuntas" : (isVerif ? "Verifikasi" : (isTerjawab ? "Terjawab" : "Menunggu"));
+
+                // --- 3. Kolom Tindakan ---
+                let actionHtml = "";
+                if (!isTerjawab || isPerbaikan) {
+                    actionHtml = `<textarea id="reply-${id}" class="w-full p-2 text-[10px] border rounded-lg mb-2 outline-none font-bold" rows="2" placeholder="Input jawaban/catatan perbaikan..."></textarea>
+                                  <button onclick="handleAction(${id}, 'Kirim')" class="w-full bg-blue-600 text-white py-2 rounded-lg text-[10px] font-black uppercase shadow-md">Kirim Respon</button>`;
+                } else if (isVerif) {
+                    actionHtml = `<textarea id="reply-${id}" class="w-full p-2 text-[10px] border rounded-lg mb-2 outline-none font-bold" rows="2" placeholder="Catatan verifikasi..."></textarea>
+                                  <div class="flex space-x-1">
+                                    <button onclick="handleAction(${id}, 'Tuntas')" class="flex-1 bg-teal-600 text-white py-2 rounded-lg text-[9px] font-black uppercase">Selesai</button>
+                                    <button onclick="handleAction(${id}, 'Perlu Perbaikan')" class="flex-1 bg-red-500 text-white py-2 rounded-lg text-[9px] font-black uppercase">Tolak</button>
+                                  </div>`;
                 } else {
-                    tindakanHtml = `<div class="text-blue-500 text-[10px] font-black uppercase italic text-center">⏳ Menunggu TL OPD</div>`;
+                    actionHtml = `<span class="text-[10px] text-gray-400 italic">Data telah diproses.</span>`;
                 }
 
-                return `
-                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                return `<tr>
                     <td class="p-5 align-top">
                         <div class="text-[11px] font-black text-blue-600 mb-1">${regNum}</div>
                         <div class="text-[11px] font-black text-gray-800 uppercase leading-tight mb-2">${item.instansi}</div>
                         <span class="bg-gray-100 text-[9px] px-2 py-1 rounded-md border uppercase font-black">${item.kategori}</span>
                     </td>
-                    <td class="p-5 align-top space-y-2">
-                        ${bubblePertanyaan}
-                        ${bubbleJawaban}
-                        ${bubbleTl}
+                    <td class="p-5 align-top">
+                        <div class="bubble bubble-user"><span class="label-bubble text-gray-500">❓ Konsultasi Masuk</span><div class="font-black mb-1">${item.judul_masalah}</div><div>${item.rincian_masalah}</div>${userFile}</div>
+                        ${isTerjawab ? `<div class="bubble bubble-auditor"><span class="label-bubble text-blue-600">🧑‍💻 Jawaban Auditor</span><div>${item.jawaban}</div></div>` : ""}
+                        ${tlBubble}
+                        ${catatanBubble}
                     </td>
-                    <td class="p-5 align-top" id="action-cell-${id}">
+                    <td class="p-5 text-center align-top pt-8"><span class="inline-block w-24 py-1.5 text-[9px] font-black rounded-full border uppercase ${badge}">${txt}</span></td>
+                    <td class="p-5 align-top">
                         <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-                            <p class="text-[9px] font-black text-gray-400 uppercase mb-2 text-center">Verifikasi Auditor</p>
-                            ${tindakanHtml}
+                            ${actionHtml}
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <a href="https://wa.me/${item.nomor_hp}" target="_blank" class="bg-green-500 text-white py-1.5 rounded-lg text-[9px] font-black uppercase text-center">WA</a>
+                                <a href="mailto:${item.email}" class="bg-gray-700 text-white py-1.5 rounded-lg text-[9px] font-black uppercase text-center">Email</a>
+                            </div>
                         </div>
                     </td>
                 </tr>`;
@@ -231,65 +195,39 @@
         }
 
         async function handleAction(id, type) {
-            const replyBox = document.getElementById(`reply-${id}`);
-            const msg = replyBox ? replyBox.value.trim() : '';
-
-            if ((type === 'Kirim' || type === 'Tuntas' || type === 'Perlu Perbaikan') && !msg) {
-                return Swal.fire('Wajib Isi', 'Mohon berikan respon/catatan!', 'warning');
-            }
-
+            const msg = document.getElementById(`reply-${id}`).value.trim();
+            if (!msg) return Swal.fire('Wajib Isi', 'Mohon isi respon/catatan!', 'warning');
+            
             Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
+            
             let updateData = {};
-            if (type === 'Kirim') {
-                updateData = { jawaban: msg, waktu_jawaban: new Date().toISOString(), status_tl: "Belum TL" };
-            } else if (type === 'Tuntas') {
-                updateData = { status_tl: "Tuntas", catatan_admin_tl: msg };
-            } else if (type === 'Perlu Perbaikan') {
-                updateData = { status_tl: "Perlu Perbaikan", catatan_admin_tl: msg };
-            }
+            if (type === 'Kirim') updateData = { jawaban: msg, waktu_jawaban: new Date().toISOString(), status_tl: "Belum TL" };
+            else if (type === 'Tuntas') updateData = { status_tl: "Tuntas", catatan_admin_tl: msg };
+            else if (type === 'Perlu Perbaikan') updateData = { status_tl: "Perlu Perbaikan", catatan_admin_tl: msg };
 
             try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, {
-                    method: 'PATCH',
-                    headers: headers,
-                    body: JSON.stringify(updateData)
-                });
-                if (res.ok) {
-                    Swal.fire({ icon: 'success', title: 'Berhasil', timer: 1000, showConfirmButton: false });
-                    fetchAdmin();
-                }
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/konsultasi?id=eq.${id}`, { method: 'PATCH', headers, body: JSON.stringify(updateData) });
+                if (res.ok) { Swal.fire({ icon: 'success', title: 'Berhasil', timer: 1000, showConfirmButton: false }); fetchAdmin(); }
             } catch (e) { Swal.fire('Error', 'Gagal update data', 'error'); }
-        }
-
-        // Helper Drive Link
-        function parseDriveLink(link) {
-            if (link.includes('drive.google.com')) {
-                const id = link.split('/d/')[1]?.split('/')[0] || link.split('id=')[1];
-                return `https://drive.google.com/uc?export=view&id=${id}`;
-            }
-            return link;
-        }
-
-        function generateRegNum(id, waktu) {
-            const d = new Date(waktu);
-            return `REG/ITDA/${("0"+d.getDate()).slice(-2)}${("0"+(d.getMonth()+1)).slice(-2)}${d.getFullYear()}/${("0000" + id).slice(-4)}`;
         }
 
         function updateAdminStats(data) {
             document.getElementById('stat-wilayah-total').innerText = data.length;
             document.getElementById('stat-wilayah-pending').innerText = data.filter(i => !i.jawaban).length;
+            document.getElementById('stat-wilayah-proses').innerText = data.filter(i => i.jawaban && (i.status_tl === "Belum TL" || i.status_tl === "Perlu Perbaikan")).length;
             document.getElementById('stat-wilayah-verif').innerText = data.filter(i => i.status_tl === "Menunggu Verifikasi").length;
             document.getElementById('stat-wilayah-done').innerText = data.filter(i => i.status_tl === "Tuntas").length;
         }
 
-        async function refreshAdminData() {
-            const icon = document.getElementById('refresh-icon-admin');
-            icon.classList.add('spin');
-            await fetchAdmin();
-            setTimeout(() => icon.classList.remove('spin'), 800);
+        function parseDriveLink(link) {
+            if (link && link.includes('drive.google.com')) {
+                const id = link.split('/d/')[1]?.split('/')[0] || link.split('id=')[1];
+                return `https://drive.google.com/uc?export=view&id=${id}`;
+            }
+            return link;
         }
-
+        function generateRegNum(id, waktu) { const d = new Date(waktu); return `REG/ITDA/${("0"+d.getDate()).slice(-2)}${("0"+(d.getMonth()+1)).slice(-2)}${d.getFullYear()}/${("0000" + id).slice(-4)}`; }
+        async function refreshAdminData() { const i = document.getElementById('refresh-icon-admin'); i.classList.add('spin'); await fetchAdmin(); setTimeout(()=>i.classList.remove('spin'), 800); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
         async function logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
     </script>
